@@ -61,3 +61,5 @@ table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{text-align:left
 .an{display:none!important}
 .thu{background:var(--vang);color:#fff;text-align:center;font-size:13px;font-weight:700;padding:5px}
 details{background:var(--the);border:1px solid var(--vien);border-radius:14px;padding:12px 14px;margin-bottom:8px}summary{font-weight:700;cursor:pointer}details p{margin-top:8px;color:var(--mo);font-size:15.5px}
+/* màn hình rộng: giữ khung điện thoại ở giữa, thanh dưới không kéo dài cả màn */
+@media (min-width:640px){.duoi{left:50%;right:auto;width:560px;transform:translateX(-50%);border:1px solid var(--vien);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(22,35,58,.06)}.dau{padding-left:max(16px,calc(50% - 264px));padding-right:max(16px,calc(50% - 264px))}}
