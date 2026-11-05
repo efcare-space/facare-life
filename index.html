@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FaCare Life</title>
+<meta name="theme-color" content="#009574">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="chung.css">
+<script>window.EFC_URL='https://efc-may-chu.efcare.workers.dev';window.EFL_URL='https://efl-may-chu.efcare.workers.dev'; /* DAN_URL_MAY_CHU_FACARE_LIFE */</script>
+<script src="chung.js"></script>
+</head><body>
+<div id="thu" class="thu an">Kho thử · dữ liệu giả</div>
+
+<!-- ===== Đăng nhập: 2 lựa chọn trên cùng EF-ID ===== -->
+<section id="manDangNhap" class="vung an">
+  <div style="text-align:center;margin:28px 0 8px"><div class="logo" style="justify-content:center"><span id="logoLon" style="width:56px;height:56px;display:inline-block"></span></div>
+    <div class="chu-logo" style="font-size:40px;margin-top:10px"><span class="fa">FaCare</span> <span class="li">Life</span></div>
+    <p class="mo" style="margin-top:8px">Theo dõi sức khỏe 365 ngày cùng cả gia đình</p></div>
+  <div class="lua-chon" role="radiogroup" aria-label="Bạn là">
+    <button data-vao="khach" class="on" role="radio" aria-checked="true"><span class="nhan xanh">Khách hàng</span><b>Tôi là khách hàng</b><span>Đơn hàng, gói chăm sóc, lịch hẹn</span></button>
+    <button data-vao="ctv" role="radio" aria-checked="false"><span class="nhan">Cộng tác viên</span><b>Tôi là cộng tác viên</b><span>Việc, học, bán hàng, thu nhập</span></button>
+  </div>
+  <div class="the" id="khungDN">
+    <h2>Đăng nhập tài khoản EFCARE</h2>
+    <p class="mo">Một tài khoản dùng chung cho EFCommunity và FaCare Life.</p>
+    <label for="dnSdt">Số điện thoại</label><input id="dnSdt" inputmode="tel" autocomplete="tel" placeholder="0912345678">
+    <label for="dnPin">Mã PIN (6 số)</label><input id="dnPin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <div id="dnBao"></div>
+    <button class="nut rong" id="dnNut" style="margin-top:14px">Đăng nhập</button>
+    <p class="mo" style="text-align:center;margin-top:12px">Chưa có tài khoản? <a href="#" id="moTao">Tạo tài khoản EFCARE</a></p>
+  </div>
+  <div class="the an" id="khungTao">
+    <h2>Tạo tài khoản EFCARE</h2>
+    <label for="tTen">Họ tên</label><input id="tTen" autocomplete="name">
+    <label for="tSdt">Số điện thoại</label><input id="tSdt" inputmode="tel" autocomplete="tel">
+    <label for="tNam">Năm sinh</label><input id="tNam" inputmode="numeric" maxlength="4" placeholder="1985">
+    <label for="tPin">Đặt mã PIN (6 số)</label><input id="tPin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+    <label class="o-chon"><input type="checkbox" id="tDy"> Tôi đồng ý để EFCARE lưu thông tin tài khoản (họ tên, số điện thoại) để đăng nhập và liên hệ.</label>
+    <div id="tBao"></div>
+    <button class="nut rong" id="tNut">Tạo tài khoản</button>
+    <p class="mo" style="text-align:center;margin-top:12px"><a href="#" id="veDN">Đã có tài khoản? Đăng nhập</a></p>
+  </div>
+</section>
+
+<!-- ===== Ứng dụng sau đăng nhập ===== -->
+<header class="dau an" id="dau">
+  <div class="logo"><span id="logoNho" style="width:30px;height:30px;display:inline-block"></span><span class="chu-logo"><span class="fa">FaCare</span> <span class="li">Life</span></span></div>
+  <div class="phai"><div class="chuyen an" id="chuyen"><button data-kg="khach">Khách</button><button data-kg="ctv">CTV</button></div>
+    <a class="nut phu nho an" id="denQT" href="quan-tri.html">Quản trị</a></div>
+</header>
+<main class="vung an" id="noiDung"></main>
+<nav class="duoi an" id="duoi"></nav>
+
+<script>
+const F = window.FL, $ = (id) => document.getElementById(id), E = F.esc;
+let TOI = null, KG = 'khach', TAB = '', CHON = 'khach', DM = null;
+if (F.THU) $('thu').classList.remove('an');
+$('logoLon').innerHTML = F.logo; $('logoNho').innerHTML = F.logo;
+const IC = {
+  nha: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>', don: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
+  khoa: '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>', mua: '<path d="M5 7h14l-1 13H6zM9 7a3 3 0 0 1 6 0"/>',
+  viec: '<path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>', hoc: '<path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"/>',
+  ban: '<path d="M4 4h16v4H4zM6 8v12h12V8M10 12h4"/>', nguoi: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M16 11a3 3 0 1 0 0-6M21 20c0-2-1-4-3-5"/>',
+  tien: '<circle cx="12" cy="12" r="9"/><path d="M15 9c-1-1-2-1.5-3-1.5-2 0-3 1-3 2.3 0 3 6 1.5 6 4.5 0 1.3-1.3 2.2-3 2.2-1.3 0-2.5-.5-3.3-1.5M12 6v1.5M12 16.5V18"/>',
+  toi: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>',
+};
+const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+const TABS = {
+  khach: [['tong', 'Tổng quan', 'nha'], ['don', 'Đơn hàng', 'don'], ['mua', 'Sản phẩm', 'mua'], ['dongy', 'Dữ liệu', 'khoa']],
+  ctv: [['homnay', 'Hôm nay', 'viec'], ['hoc', 'Học', 'hoc'], ['ban', 'Bán hàng', 'ban'], ['khach', 'Khách', 'nguoi'], ['thunhap', 'Thu nhập', 'tien'], ['hoso', 'Hồ sơ', 'toi']],
+};
+
+// ---- Đăng nhập ----
+document.querySelectorAll('[data-vao]').forEach((b) => b.onclick = () => { CHON = b.dataset.vao; document.querySelectorAll('[data-vao]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); }); });
+$('moTao').onclick = (e) => { e.preventDefault(); $('khungDN').classList.add('an'); $('khungTao').classList.remove('an'); };
+$('veDN').onclick = (e) => { e.preventDefault(); $('khungTao').classList.add('an'); $('khungDN').classList.remove('an'); };
+async function lam(nut, baoEl, fn) { nut.disabled = true; F.bao(baoEl, ''); try { await fn(); } catch (e) { F.bao(baoEl, e.message); } finally { nut.disabled = false; } }
+$('dnNut').onclick = () => lam($('dnNut'), $('dnBao'), async () => { await F.dangNhap($('dnSdt').value, $('dnPin').value); KG = CHON; await vao(); });
+$('tNut').onclick = () => lam($('tNut'), $('tBao'), async () => { await F.taoTaiKhoan({ ten: $('tTen').value, sdt: $('tSdt').value, namSinh: $('tNam').value, pin: $('tPin').value, dongY: $('tDy').checked }); KG = CHON; await vao(); });
+
+async function vao() {
+  try { TOI = await F.goi('toi'); } catch (e) { return hienDangNhap(); }
+  $('manDangNhap').classList.add('an'); ['dau', 'noiDung', 'duoi'].forEach((i) => $(i).classList.remove('an'));
+  const coCtv = !!TOI.ctv; $('chuyen').classList.toggle('an', !coCtv); $('denQT').classList.toggle('an', !TOI.laNhanVien);
+  if (KG === 'ctv' && !coCtv) return veDangKyCtv();
+  if (!['khach', 'ctv'].includes(KG)) KG = 'khach';
+  chuyenKG(KG);
+}
+function hienDangNhap() { $('manDangNhap').classList.remove('an'); ['dau', 'noiDung', 'duoi'].forEach((i) => $(i).classList.add('an')); }
+document.querySelectorAll('[data-kg]').forEach((b) => b.onclick = () => chuyenKG(b.dataset.kg));
+function chuyenKG(kg) {
+  KG = kg; document.querySelectorAll('[data-kg]').forEach((b) => b.classList.toggle('on', b.dataset.kg === kg));
+  const ds = TABS[kg]; $('duoi').innerHTML = ds.map(([k, t, i]) => `<button data-tab="${k}">${svg(i)}${t}</button>`).join('');
+  $('duoi').querySelectorAll('button').forEach((b) => b.onclick = () => moTab(b.dataset.tab));
+  moTab(ds[0][0]);
+}
+async function moTab(t) {
+  TAB = t; $('duoi').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+  const nd = $('noiDung'); nd.innerHTML = '<p class="mo">Đang tải…</p>'; window.scrollTo(0, 0);
+  try { await (KG === 'khach' ? KHACH : CTV)[t](nd); } catch (e) { if (e.canDangNhap) return hienDangNhap(); nd.innerHTML = `<div class="bao">${E(e.message)}</div>`; }
+}
+const theDon = (d, xemCtv) => `<div class="the"><div class="dong" style="border:0;padding:0 0 8px"><b>${E(d.ma)}</b><span class="nhan ${d.trang_thai === 'moi' ? 'vang' : ['huy', 'tra_lai'].includes(d.trang_thai) ? 'do' : 'xanh'}">${F.TT[d.trang_thai]}</span></div>
+  ${d.dong.map((x) => `<div class="dong"><span>${E(x.ten)} × ${x.sl}</span><span class="so">${F.tien(x.sl * x.don_gia)}</span></div>`).join('')}
+  <div class="dong"><b>Tổng</b><span class="so">${F.tien(d.tong)}</span></div>
+  <p class="mo">Tạo ${F.ngay(d.tao)}${d.ngay_thu ? ' · thu ' + F.ngay(d.ngay_thu) : ''}${d.ngay_giao ? ' · giao ' + F.ngay(d.ngay_giao) : ''}</p>
+  ${xemCtv && d.trang_thai === 'moi' ? `<button class="nut phu nho" data-huy="${E(d.ma)}" style="margin-top:8px">Huỷ đơn (khách không mua)</button>` : ''}</div>`;
+
+// ---- Không gian Khách hàng ----
+const KHACH = {
+  async tong(nd) {
+    const d = await F.goi('khachTongQuan'), cho = d.don.filter((x) => x.trang_thai === 'moi');
+    nd.innerHTML = `<h1>Chào ${E(TOI.ten)}</h1><p class="mo" style="margin-bottom:14px">Mã EFCARE của anh chị: <b>${E(TOI.efc)}</b></p>
+      ${cho.length ? `<div class="the" style="border-color:var(--vang)"><h2>Chờ thanh toán</h2>${cho.map((x) => `<div class="dong"><span>${E(x.ma)}</span><span class="so">${F.tien(x.tong)}</span></div>`).join('')}
+        <p class="mo" style="margin-top:8px">Chuyển khoản trong 24 giờ với nội dung là <b>mã đơn</b>. ${d.taiKhoan ? 'Tài khoản: ' + E(d.taiKhoan) : 'Cộng tác viên sẽ gửi thông tin tài khoản nhận tiền.'}</p></div>` : ''}
+      <div class="the"><h2>Người đồng hành</h2>${d.ctvPhuTrach ? `<div class="dong"><span>Cộng tác viên<br><b>${E(d.ctvPhuTrach.ten)}</b></span><a class="nut phu nho" href="tel:${E(d.ctvPhuTrach.sdt)}">Gọi ${E(d.ctvPhuTrach.sdt)}</a></div>` : '<p class="mo">Chưa có cộng tác viên phụ trách.</p>'}
+        <p class="mo" style="margin-top:6px">Bác sĩ gia đình được phân công khi anh chị dùng Gói An tâm gia đình.</p></div>
+      <div class="the"><h2>Đơn gần đây</h2>${d.don.length ? d.don.slice(0, 3).map((x) => `<div class="dong"><span>${E(x.ma)}<br><span class="mo">${F.TT[x.trang_thai]}</span></span><span class="so">${F.tien(x.tong)}</span></div>`).join('') : '<p class="mo">Chưa có đơn.</p>'}</div>
+      <p class="mo">Chỉ số sức khỏe xem trên ứng dụng FaCare. FaCare Life không lưu thông tin y khoa.</p>`;
+  },
+  async don(nd) { const d = await F.goi('khachTongQuan'); nd.innerHTML = '<h1 style="margin-bottom:12px">Đơn hàng</h1>' + (d.don.length ? d.don.map((x) => theDon(x)).join('') : '<div class="the mo">Chưa có đơn.</div>'); },
+  async mua(nd) {
+    DM = DM || await F.goi('danhMuc');
+    const nhom = (l) => DM.sanPham.filter((x) => x.loai === l);
+    const ds = (l) => nhom(l).map((x) => `<div class="dong"><span>${E(x.ten)}</span><span class="so">${F.tien(x.gia)}</span></div>`).join('');
+    nd.innerHTML = `<h1>Sản phẩm</h1><p class="mo" style="margin-bottom:12px">Giá đã gồm thuế GTGT, giao tận nhà, hướng dẫn miễn phí. Đặt mua qua cộng tác viên để được hướng dẫn tận nơi.</p>
+      <div class="the"><h2>Vali Y tế</h2>${ds('Vali trọn bộ')}</div><div class="the"><h2>Thuê Vali Gia Đình 1</h2>${ds('Thuê Vali')}<p class="mo">Đặt cọc 5.000.000đ, hoàn lại khi trả thiết bị nguyên vẹn.</p></div>
+      <div class="the"><h2>Vật tư</h2>${ds('Vật tư')}</div>`;
+  },
+  async dongy(nd) {
+    const d = await F.goi('khachTongQuan');
+    nd.innerHTML = `<h1>Dữ liệu của tôi</h1><p class="mo" style="margin-bottom:12px">Bật hoặc tắt từng mục. FaCare Life chỉ lưu thông tin hành chính (họ tên, số điện thoại, đơn hàng, lịch hẹn), không lưu thông tin y khoa.</p>
+      <div class="the">${Object.entries(d.mucDich).map(([k, t]) => `<label class="o-chon" style="justify-content:space-between"><span>${E(t)}</span><input type="checkbox" data-dy="${k}" ${d.dongY[k] ? 'checked' : ''}></label>`).join('')}<div id="dyBao"></div></div>`;
+    nd.querySelectorAll('[data-dy]').forEach((c) => c.onchange = async () => { try { await F.goi('datDongY', c.dataset.dy, c.checked); F.bao($('dyBao'), 'Đã lưu.', true); } catch (e) { c.checked = !c.checked; F.bao($('dyBao'), e.message); } });
+  },
+};
+
+// ---- Đăng ký CTV ----
+function veDangKyCtv() {
+  ['duoi'].forEach((i) => $(i).classList.add('an'));
+  $('noiDung').innerHTML = `<h1>Trở thành cộng tác viên</h1><p class="mo" style="margin:6px 0 14px">Đăng ký xong anh chị vào học ngay, không phải chờ duyệt. Học xong và đạt bài kiểm tra thì được mở bán.</p>
+    <div class="the"><label for="cTinh">Tỉnh, thành phố</label><input id="cTinh"><label for="cMail">Email (nhận thông báo)</label><input id="cMail" type="email" autocomplete="email">
+    <label for="cGt">Mã người giới thiệu (nếu có)</label><input id="cGt" placeholder="EFC-000123" value="${E(new URLSearchParams(location.search).get('ctv') || '')}">
+    <label class="o-chon"><input type="checkbox" id="cDy"> Tôi đồng ý điều khoản cộng tác của FaCare Life.</label><div id="cBao"></div>
+    <button class="nut rong" id="cNut">Đăng ký cộng tác viên</button><button class="nut phu rong" id="cBo" style="margin-top:8px">Để sau, vào phần khách hàng</button></div>`;
+  $('cBo').onclick = () => { $('duoi').classList.remove('an'); chuyenKG('khach'); };
+  $('cNut').onclick = () => lam($('cNut'), $('cBao'), async () => { await F.goi('dangKyCtv', { tinh: $('cTinh').value, email: $('cMail').value, nguoiGt: $('cGt').value, dongY: $('cDy').checked }); KG = 'ctv'; $('duoi').classList.remove('an'); await vao(); });
+}
+
+// ---- Không gian Cộng tác viên ----
+let CT = null;
+const taiCtv = async (ky) => (CT = await F.goi('ctvTongQuan', ky));
+const moBan = () => CT && CT.ctv.trang_thai === 'hoat_dong';
+const CTV = {
+  async homnay(nd) {
+    await taiCtv();
+    const tt = { dang_hoc: ['vang', 'Đang học'], hoat_dong: ['xanh', 'Đang hoạt động'], tam_dung: ['do', 'Tạm dừng'] }[CT.ctv.trang_thai];
+    nd.innerHTML = `<h1>Hôm nay</h1><p style="margin:6px 0 14px"><span class="nhan ${tt[0]}">${tt[1]}</span> <span class="mo">· ${E(CT.ctv.buocTen)}</span></p>
+      ${!moBan() ? `<div class="the" style="border-color:var(--vang)"><h2>Hoàn thành lộ trình học để được mở bán</h2><p class="mo">Học viện sẽ mời anh chị vào lớp. Đạt bài kiểm tra là lên đơn được.</p><button class="nut nho" style="margin-top:8px" onclick="moTab('hoc')">Xem lộ trình</button></div>` : ''}
+      <div class="the"><h2>Việc cần làm</h2>${CT.viec.length ? CT.viec.map((v) => `<div class="dong"><span>${E(v.ghi)}</span><span class="mo">${E(v.ma)}</span></div>`).join('') : '<p class="mo">Không có việc tồn.</p>'}</div>
+      <div class="hai"><div class="the"><p class="mo">Hoa hồng tháng này</p><div class="lon">${F.tien(CT.tong.tong)}</div></div><div class="the"><p class="mo">Đơn chờ thu</p><div class="lon">${CT.don.filter((d) => d.trang_thai === 'moi').length}</div></div></div>
+      <p class="mo">Lịch thăm khách và việc do bác sĩ giao có ở đợt 2.</p>`;
+  },
+  async hoc(nd) {
+    await taiCtv(); const b = CT.ctv.buoc;
+    nd.innerHTML = `<h1>Lộ trình học</h1><p class="mo" style="margin:6px 0 14px">Mục tiêu 5 ngày. Bước 2, 3 anh chị tự đánh dấu sau khi đọc tài liệu; các bước khác Học viện xác nhận sau buổi học.</p>
+      <div class="the">${CT.loTrinh.slice(1).map((t, i) => { const n = i + 1, xong = b >= n; return `<div class="buoc ${xong ? 'xong' : ''}"><i>${xong ? '✓' : n}</i><span style="flex:1">${E(t.replace(/^Đã /, ''))}</span>${!xong && (n === 2 || n === 3) && b === n - 1 ? `<button class="nut nho" data-hx="${n}">Đã xong</button>` : ''}</div>`; }).join('')}
+      <div class="buoc ${moBan() ? 'xong' : ''}"><i>${moBan() ? '✓' : '6'}</i><span style="flex:1"><b>Bài kiểm tra</b> — đạt thì mở bán</span></div><div id="hBao"></div></div>`;
+    nd.querySelectorAll('[data-hx]').forEach((x) => x.onclick = () => lam(x, $('hBao'), async () => { await F.goi('hocXong', Number(x.dataset.hx)); moTab('hoc'); }));
+  },
+  async ban(nd) {
+    await taiCtv(); DM = DM || await F.goi('danhMuc');
+    if (!moBan()) { nd.innerHTML = '<h1>Bán hàng</h1><div class="the"><h2>Chưa mở bán</h2><p class="mo">Lên đơn và chia sẻ link mở sau khi anh chị đạt bài kiểm tra.</p></div>'; return; }
+    const ban = DM.sanPham.filter((x) => x.nhom !== 'kiosk');
+    const link = location.origin + location.pathname + '?ctv=' + encodeURIComponent(TOI.efc);
+    nd.innerHTML = `<h1>Lên đơn cho khách</h1>
+      <div class="the"><label for="bTen">Tên khách</label><input id="bTen"><label for="bSdt">Số điện thoại khách</label><input id="bSdt" inputmode="tel">
+      <label for="bDc">Địa chỉ giao</label><input id="bDc">
+      <div id="bDong"></div><button class="nut phu nho" id="bThem" style="margin-top:10px">+ Thêm sản phẩm</button>
+      <div class="dong" style="margin-top:10px"><b>Tạm tính</b><span class="so" id="bTong">0đ</span></div>
+      <label class="o-chon"><input type="checkbox" id="bDy"> Khách đồng ý để FaCare Life liên hệ tư vấn và xử lý đơn.</label><div id="bBao"></div>
+      <button class="nut rong" id="bNut">Tạo đơn</button><p class="mo" style="margin-top:8px">Khách chuyển khoản thẳng vào tài khoản công ty, nội dung là mã đơn. Cộng tác viên không thu tiền, không đổi giá.</p></div>
+      <div class="the"><h2>Link giới thiệu của tôi</h2><p class="mo" style="word-break:break-all">${E(link)}</p><button class="nut phu nho" id="bChep" style="margin-top:8px">Sao chép link</button></div>`;
+    const dong = () => `<div class="hai" style="grid-template-columns:1fr 70px;margin-top:8px"><select>${ban.map((x) => `<option value="${E(x.ma)}" data-gia="${x.gia}">${E(x.ten)} · ${F.tien(x.gia)}</option>`).join('')}</select><input type="number" min="1" value="1" aria-label="Số lượng"></div>`;
+    const tinh = () => { let s = 0; $('bDong').querySelectorAll('.hai').forEach((r) => { s += Number(r.querySelector('option:checked').dataset.gia) * Math.max(0, Number(r.querySelector('input').value) || 0); }); $('bTong').textContent = F.tien(s); };
+    $('bDong').innerHTML = dong(); $('bThem').onclick = () => { $('bDong').insertAdjacentHTML('beforeend', dong()); tinh(); };
+    $('bDong').oninput = tinh; $('bDong').onchange = tinh; tinh();
+    $('bChep').onclick = () => navigator.clipboard.writeText(link).then(() => $('bChep').textContent = 'Đã chép', () => $('bChep').textContent = 'Chọn và chép tay');
+    $('bNut').onclick = () => lam($('bNut'), $('bBao'), async () => {
+      const ds = [...$('bDong').querySelectorAll('.hai')].map((r) => ({ ma: r.querySelector('select').value, sl: Number(r.querySelector('input').value) }));
+      const d = await F.goi('taoDon', { ten: $('bTen').value, sdt: $('bSdt').value, diaChi: $('bDc').value, dongYLienHe: $('bDy').checked, dong: ds });
+      F.bao($('bBao'), `Đã tạo đơn ${d.ma}, tổng ${F.tien(d.tong)}. Gửi khách thông tin chuyển khoản với nội dung "${d.ma}".`, true);
+      ['bTen', 'bSdt', 'bDc'].forEach((i) => $(i).value = ''); $('bDy').checked = false;
+    });
+  },
+  async khach(nd) {
+    await taiCtv();
+    nd.innerHTML = `<h1>Khách của tôi</h1><p class="mo" style="margin:6px 0 12px">Số điện thoại hiện đủ khi khách đã đồng ý liên hệ.</p>
+      <div class="the">${CT.khach.length ? CT.khach.map((k) => `<div class="dong"><span><b>${E(k.ten)}</b><br><span class="mo">${E(k.sdt)}</span></span>${k.coTaiKhoan ? '<span class="nhan xanh">Có tài khoản</span>' : '<span class="nhan">Chưa có tài khoản</span>'}</div>`).join('') : '<p class="mo">Chưa có khách.</p>'}</div>
+      <h2 style="margin-top:16px">Đơn của tôi</h2>${CT.don.map((d) => theDon(d, true)).join('') || '<div class="the mo">Chưa có đơn.</div>'}<div id="kBao"></div>`;
+    nd.querySelectorAll('[data-huy]').forEach((b) => b.onclick = () => lam(b, $('kBao'), async () => { await F.goi('ctvHuyDon', b.dataset.huy); moTab('khach'); }));
+  },
+  async thunhap(nd, ky) {
+    await taiCtv(ky); const t = CT.tong;
+    nd.innerHTML = `<h1>Thu nhập</h1><label for="tKy">Kỳ</label><input id="tKy" type="month" value="${E(CT.ky)}">
+      <div class="the" style="margin-top:12px"><div class="dong"><span>Hoa hồng tạm tính</span><span class="so">${F.tien(t.tong)}</span></div>
+      <div class="dong"><span>Thuế TNCN khấu trừ<br><span class="mo">10% khi tổng tháng từ 5.000.000đ</span></span><span class="so">${F.tien(t.thue)}</span></div>
+      <div class="dong"><b>Thực nhận</b><span class="so">${F.tien(t.thucNhan)}</span></div>
+      <p class="mo" style="margin-top:6px">${t.daKhoa ? 'Kỳ đã chốt.' : 'Số tạm tính cho đến khi Kế toán chốt kỳ. Chi chậm nhất cuối tháng sau.'}</p></div>
+      <div class="the"><h2>Chi tiết</h2>${CT.hoaHong.length ? CT.hoaHong.map((h) => `<div class="dong"><span>${E(h.ma_don)} · ${E(h.ma_sp)}<br><span class="mo">${E(h.can_cu)}${h.ty_le ? ' · ' + Math.round(h.ty_le * 100) + '%' : ''}</span></span><span class="so">${F.tien(h.so_tien)}</span></div>`).join('') : '<p class="mo">Chưa có khoản nào trong kỳ.</p>'}</div>`;
+    $('tKy').onchange = () => CTV.thunhap(nd, $('tKy').value);
+  },
+  async hoso(nd) {
+    await taiCtv(); const c = CT.ctv;
+    nd.innerHTML = `<h1>Hồ sơ</h1><div class="the"><div class="dong"><span>Họ tên</span><b>${E(TOI.ten)}</b></div><div class="dong"><span>Mã EFCARE</span><b>${E(TOI.efc)}</b></div>
+      <div class="dong"><span>Số điện thoại</span><b>${E(TOI.sdt)}</b></div><div class="dong"><span>Tỉnh</span><b>${E(c.tinh || '—')}</b></div>
+      <div class="dong"><span>Người giới thiệu</span><b>${E(c.nguoi_gt || '—')}</b></div><div class="dong"><span>Ngày đăng ký</span><b>${F.ngay(c.ngay_dk)}</b></div>
+      <div class="dong"><span>Vai</span><span>${TOI.tenVai.map((v) => `<span class="nhan">${E(v)}</span>`).join(' ')}</span></div></div>
+      <p class="mo">Chứng nhận, điểm đánh giá, tài khoản nhận tiền và cam kết thuế bổ sung ở đợt sau.</p>
+      <button class="nut phu rong" id="hoOut" style="margin-top:12px">Đăng xuất</button>`;
+    $('hoOut').onclick = () => { F.dangXuat(); location.reload(); };
+  },
+};
+document.addEventListener('click', (e) => { if (e.target.closest('a[href="#"]')) e.preventDefault(); });
+(async () => { if (new URLSearchParams(location.search).get('ctv')) CHON = 'ctv'; if (F.phien()) await vao(); else hienDangNhap(); })();
+</script>
+</body></html>

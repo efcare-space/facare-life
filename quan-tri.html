@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FaCare Life · Quản trị</title>
+<meta name="theme-color" content="#233A77">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="chung.css">
+<style>
+.khung{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+@media(max-width:820px){.khung{grid-template-columns:1fr}.ben{position:static!important;height:auto!important;display:flex;overflow-x:auto;gap:4px;padding:8px!important}.ben button{flex:none}}
+.ben{background:var(--the);border-right:1px solid var(--vien);padding:14px 10px;position:sticky;top:0;height:100vh}
+.ben button{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:9px;font-weight:600;color:var(--mo);cursor:pointer}
+.ben button.on{background:var(--navy);color:#fff}
+.chinh{padding:20px 16px 60px;max-width:1100px}
+.loc{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.loc button{border:1px solid var(--vien);background:var(--the);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}.loc button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+td .nut{margin:2px 4px 2px 0}
+</style>
+<script>window.EFC_URL='https://efc-may-chu.efcare.workers.dev';window.EFL_URL='https://efl-may-chu.efcare.workers.dev'; /* DAN_URL_MAY_CHU_FACARE_LIFE */</script>
+<script src="chung.js"></script>
+</head><body>
+<div id="thu" class="thu an">Kho thử · dữ liệu giả</div>
+<section id="manDN" class="vung an" style="max-width:420px">
+  <div class="logo" style="justify-content:center;margin:30px 0 6px"><span id="lg" style="width:44px;height:44px;display:inline-block"></span><span class="chu-logo" style="font-size:30px"><span class="fa">FaCare</span> <span class="li">Life</span></span></div>
+  <p class="mo" style="text-align:center;margin-bottom:16px">Quản trị · dành cho nhân sự được phân quyền</p>
+  <div class="the"><label for="s">Số điện thoại</label><input id="s" inputmode="tel"><label for="p">Mã PIN</label><input id="p" type="password" inputmode="numeric" maxlength="6">
+    <div id="dnB"></div><button class="nut navy rong" id="dnN" style="margin-top:12px">Đăng nhập</button></div>
+</section>
+<div class="khung an" id="khung">
+  <nav class="ben" id="ben"></nav>
+  <main class="chinh"><div class="dong" style="border:0;padding:0 0 10px"><div><b id="ten"></b> <span id="vai"></span></div><span><a href="index.html" class="nut phu nho">Mở app</a> <button class="nut phu nho" id="out">Đăng xuất</button></span></div><div id="nd"></div></main>
+</div>
+<script>
+const F = window.FL, $ = (i) => document.getElementById(i), E = F.esc;
+if (F.THU) $('thu').classList.remove('an'); $('lg').innerHTML = F.logo;
+let TOI = null;
+// Mục hiện theo vai (ma trận quyền: outline mục 5). Máy chủ kiểm quyền lần nữa ở mỗi thao tác.
+const MUC = [
+  ['don', 'Đơn hàng', ['ke_toan', 'kho', 'gd_kd', 'ban_dh']],
+  ['ctv', 'Cộng tác viên', ['hoc_vien', 'gd_kd', 'ban_dh', 'dieu_phoi']],
+  ['hh', 'Hoa hồng', ['ke_toan', 'gd_kd', 'ban_dh']],
+  ['nguoi', 'Người và vai', []],
+  ['ts', 'Tham số', []],
+  ['nk', 'Nhật ký', ['ban_dh']],
+];
+const co = (ds) => TOI.vai.includes('super_admin') || ds.some((v) => TOI.vai.includes(v));
+async function lam(nut, el, fn) { if (nut) nut.disabled = true; F.bao(el, ''); try { await fn(); } catch (e) { F.bao(el, e.message); } finally { if (nut) nut.disabled = false; } }
+$('dnN').onclick = () => lam($('dnN'), $('dnB'), async () => { await F.dangNhap($('s').value, $('p').value); await vao(); });
+$('out').onclick = () => { F.dangXuat(); location.reload(); };
+async function vao() {
+  try { TOI = await F.goi('toi'); } catch (e) { $('manDN').classList.remove('an'); $('khung').classList.add('an'); return; }
+  if (!TOI.laNhanVien) { $('manDN').classList.remove('an'); F.bao($('dnB'), 'Tài khoản ' + TOI.efc + ' chưa được gán vai nhân sự. Liên hệ Super Admin.'); return; }
+  $('manDN').classList.add('an'); $('khung').classList.remove('an');
+  $('ten').textContent = TOI.ten + ' · ' + TOI.efc; $('vai').innerHTML = TOI.tenVai.map((v) => `<span class="nhan">${E(v)}</span>`).join(' ');
+  const ds = MUC.filter((m) => co(m[2]));
+  $('ben').innerHTML = `<div class="logo" style="padding:4px 8px 12px"><span style="width:26px;height:26px;display:inline-block">${F.logo}</span><span class="chu-logo" style="font-size:18px"><span class="fa">FaCare</span> <span class="li">Life</span></span></div>` + ds.map((m) => `<button data-m="${m[0]}">${m[1]}</button>`).join('');
+  $('ben').querySelectorAll('[data-m]').forEach((b) => b.onclick = () => mo(b.dataset.m));
+  mo(ds[0][0]);
+}
+async function mo(m, arg) {
+  $('ben').querySelectorAll('[data-m]').forEach((b) => b.classList.toggle('on', b.dataset.m === m));
+  const nd = $('nd'); nd.innerHTML = '<p class="mo">Đang tải…</p>';
+  try { await V[m](nd, arg); } catch (e) { nd.innerHTML = `<div class="bao">${E(e.message)}</div>`; }
+}
+const V = {
+  async don(nd, tt = '') {
+    const ds = await F.goi('qtDon', { trangThai: tt });
+    const nutCho = (d) => {
+      const n = [];
+      if (d.trang_thai === 'moi' && co(['ke_toan'])) n.push(`<button class="nut nho" data-a="thu" data-ma="${E(d.ma)}">Đã thu</button>`);
+      if (d.trang_thai === 'da_thu' && co(['kho'])) n.push(`<button class="nut navy nho" data-a="giao" data-ma="${E(d.ma)}">Đã giao</button>`);
+      if (d.trang_thai === 'da_giao' && co(['kho'])) n.push(`<button class="nut navy nho" data-a="kh" data-ma="${E(d.ma)}">Đã kích hoạt</button>`);
+      if (d.trang_thai === 'moi' && co(['ke_toan', 'kho'])) n.push(`<button class="nut phu nho" data-a="huy" data-ma="${E(d.ma)}">Huỷ</button>`);
+      if (['da_thu', 'da_giao', 'da_kich_hoat'].includes(d.trang_thai) && co(['ke_toan', 'kho'])) n.push(`<button class="nut do nho" data-a="tra" data-ma="${E(d.ma)}">Trả lại</button>`);
+      return n.join('');
+    };
+    nd.innerHTML = `<h1>Đơn hàng</h1><div class="loc">${[['', 'Tất cả'], ...Object.entries(F.TT)].map(([k, t]) => `<button data-tt="${k}" class="${k === tt ? 'on' : ''}">${t}</button>`).join('')}</div><div id="b"></div>
+      <div class="the cuon"><table><tr><th>Mã đơn</th><th>Khách</th><th>CTV</th><th>Sản phẩm</th><th>Tổng</th><th>Trạng thái</th><th></th></tr>
+      ${ds.map((d) => `<tr><td><b>${E(d.ma)}</b><br><span class="mo">${F.ngay(d.tao)}</span></td><td>${E(d.tenKhach)}<br><span class="mo">${E(d.khach_sdt)}</span></td><td>${E(d.tenCtv || d.ctv)}</td>
+        <td>${d.dong.map((x) => E(x.ten) + ' × ' + x.sl).join('<br>')}</td><td class="so">${F.tien(d.tong)}</td><td>${F.TT[d.trang_thai]}${d.ngay_thu ? '<br><span class="mo">thu ' + F.ngay(d.ngay_thu) + '</span>' : ''}${d.serial ? '<br><span class="mo">serial ' + E(d.serial) + '</span>' : ''}</td><td>${nutCho(d)}</td></tr>`).join('') || '<tr><td colspan="7" class="mo">Không có đơn.</td></tr>'}</table></div>`;
+    nd.querySelectorAll('[data-tt]').forEach((b) => b.onclick = () => mo('don', b.dataset.tt));
+    nd.querySelectorAll('[data-a]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => {
+      const ma = b.dataset.ma, a = b.dataset.a, hom = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
+      if (a === 'thu') { const n = prompt('Ngày tiền về tài khoản (năm-tháng-ngày):', hom); if (n === null) return; await F.goi('qtXacNhanThu', ma, n); }
+      if (a === 'giao') { const s = prompt('Số serial thiết bị đã giao:', ''); if (s === null) return; await F.goi('qtGhiGiao', ma, s); }
+      if (a === 'kh') { const m = prompt('Mã khách hàng trên App FaCare (để trống nếu chưa có):', ''); if (m === null) return; await F.goi('qtKichHoat', ma, m); }
+      if (a === 'huy') { if (!confirm('Huỷ đơn ' + ma + '?')) return; await F.goi('qtHuyDon', ma); }
+      if (a === 'tra') { const n = prompt('Ngày trả lại (năm-tháng-ngày):', hom); if (n === null) return; await F.goi('qtTraLai', ma, n); }
+      mo('don', tt);
+    }));
+  },
+  async ctv(nd) {
+    const ds = await F.goi('qtCtv'), tt = { dang_hoc: ['vang', 'Đang học'], hoat_dong: ['xanh', 'Hoạt động'], tam_dung: ['do', 'Tạm dừng'] };
+    const ghi = co(['hoc_vien']);
+    nd.innerHTML = `<h1>Cộng tác viên</h1><p class="mo">Đăng ký là vào học ngay. Học viện ghi bước học và mở bán khi đạt bài kiểm tra.</p><div id="b"></div>
+      <div class="the cuon"><table><tr><th>CTV</th><th>Tỉnh</th><th>Người giới thiệu</th><th>Bước học</th><th>Trạng thái</th><th></th></tr>
+      ${ds.map((c) => `<tr><td><b>${E(c.ten)}</b><br><span class="mo">${E(c.efc)} · ${E(c.sdt)}</span></td><td>${E(c.tinh)}</td><td>${E(c.nguoi_gt || '—')}</td>
+      <td>${ghi ? `<select data-buoc="${E(c.efc)}">${TOI_LOTRINH.map((t, i) => `<option value="${i}" ${i === c.buoc ? 'selected' : ''}>${E(t)}</option>`).join('')}</select>` : E(c.buocTen)}</td>
+      <td><span class="nhan ${tt[c.trang_thai][0]}">${tt[c.trang_thai][1]}</span></td>
+      <td>${ghi ? (c.trang_thai !== 'hoat_dong' ? `<button class="nut nho" data-mb="${E(c.efc)}">Đạt bài kiểm tra · mở bán</button>` : `<button class="nut phu nho" data-td="${E(c.efc)}">Tạm dừng</button>`) : ''}</td></tr>`).join('') || '<tr><td colspan="6" class="mo">Chưa có CTV.</td></tr>'}</table></div>`;
+    nd.querySelectorAll('[data-buoc]').forEach((s) => s.onchange = () => lam(null, $('b'), async () => { await F.goi('qtGhiBuocHoc', s.dataset.buoc, Number(s.value)); F.bao($('b'), 'Đã ghi bước học.', true); }));
+    nd.querySelectorAll('[data-mb]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Xác nhận CTV đã đạt bài kiểm tra và mở bán?')) return; await F.goi('qtMoBan', b.dataset.mb, true); mo('ctv'); }));
+    nd.querySelectorAll('[data-td]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Tạm dừng CTV này?')) return; await F.goi('qtMoBan', b.dataset.td, false); mo('ctv'); }));
+  },
+  async hh(nd, ky) {
+    const d = await F.goi('qtHoaHong', ky);
+    nd.innerHTML = `<h1>Hoa hồng</h1><label for="k">Kỳ</label><input id="k" type="month" value="${E(d.ky)}" style="max-width:200px">
+      <p style="margin:10px 0">${d.daKhoa ? '<span class="nhan xanh">Kỳ đã chốt</span>' : '<span class="nhan vang">Tạm tính</span>'} <span class="mo">Thuế TNCN 10% khi tổng tháng của một CTV từ 5.000.000đ.</span></p><div id="b"></div>
+      <div class="the cuon"><table><tr><th>CTV</th><th>Hoa hồng</th><th>Thuế</th><th>Thực nhận</th></tr>${d.ds.map((x) => `<tr><td>${E(x.ten || x.ctv)}<br><span class="mo">${E(x.ctv)}</span></td><td class="so">${F.tien(x.tong)}</td><td class="so">${F.tien(x.thue)}</td><td class="so">${F.tien(x.thucNhan)}</td></tr>`).join('') || '<tr><td colspan="4" class="mo">Chưa có.</td></tr>'}
+      <tr><th>Tổng</th><th class="so">${F.tien(d.ds.reduce((s, x) => s + x.tong, 0))}</th><th class="so">${F.tien(d.ds.reduce((s, x) => s + x.thue, 0))}</th><th class="so">${F.tien(d.ds.reduce((s, x) => s + x.thucNhan, 0))}</th></tr></table></div>
+      ${!d.daKhoa && co(['ke_toan']) ? '<button class="nut navy" id="khoa">Chốt kỳ (khoá số)</button>' : ''}`;
+    $('k').onchange = () => mo('hh', $('k').value);
+    if ($('khoa')) $('khoa').onclick = () => lam($('khoa'), $('b'), async () => { if (!confirm('Chốt kỳ ' + d.ky + '? Sau khi chốt, đơn trả lại sẽ ghi điều chỉnh vào kỳ sau.')) return; await F.goi('qtKhoaKy', d.ky); mo('hh', d.ky); });
+  },
+  async nguoi(nd, tim = '') {
+    const ds = await F.goi('qtNguoi', tim), VAI = { ke_toan: 'Kế toán', kho: 'Kho, giao vận', hoc_vien: 'Học viện', dieu_phoi: 'Điều phối chăm sóc', gd_kd: 'GĐ Kinh doanh', ban_dh: 'Ban điều hành', bac_si: 'Bác sĩ', quan_ly: 'Quản lý L1–L5', super_admin: 'Super Admin' };
+    nd.innerHTML = `<h1>Người và vai</h1><p class="mo">Người cần đăng nhập FaCare Life một lần bằng tài khoản EFCARE trước khi gán vai.</p>
+      <div class="loc"><input id="tim" placeholder="Tìm tên, SĐT, mã EFC" value="${E(tim)}" style="max-width:280px"><button id="timN">Tìm</button></div><div id="b"></div>
+      <div class="the cuon"><table><tr><th>Người</th><th>Vai</th><th>Gán thêm</th></tr>${ds.map((n) => `<tr><td><b>${E(n.ten)}</b><br><span class="mo">${E(n.efc)} · ${E(n.sdt)}</span></td>
+        <td>${n.vai.map((v) => `<span class="nhan">${E(VAI[v] || v)}${VAI[v] ? ` <a href="#" data-go="${E(n.efc)}" data-v="${v}" title="Gỡ">×</a>` : ''}</span>`).join(' ')}</td>
+        <td><select data-gan="${E(n.efc)}"><option value="">Chọn vai…</option>${Object.entries(VAI).map(([k, t]) => `<option value="${k}">${t}</option>`).join('')}</select></td></tr>`).join('')}</table></div>`;
+    $('timN').onclick = () => mo('nguoi', $('tim').value);
+    nd.querySelectorAll('[data-gan]').forEach((s) => s.onchange = () => s.value && lam(null, $('b'), async () => { await F.goi('qtGanVai', s.dataset.gan, s.value); mo('nguoi', tim); }));
+    nd.querySelectorAll('[data-go]').forEach((a) => a.onclick = (e) => { e.preventDefault(); lam(null, $('b'), async () => { if (!confirm('Gỡ vai?')) return; await F.goi('qtGanVai', a.dataset.go, a.dataset.v, true); mo('nguoi', tim); }); });
+  },
+  async ts(nd) {
+    const ds = await F.goi('qtThamSo', {});
+    nd.innerHTML = `<h1>Tham số chính sách</h1><p class="mo">Mọi thay đổi ghi nhật ký. Đổi tỷ lệ thì đơn chưa chốt kỳ được tính lại.</p><div id="b"></div>
+      <div class="the">${ds.map((t) => `<label for="ts_${t.khoa}">${E(t.khoa)} <span class="mo">· sửa ${F.ngay(t.sua_luc)} bởi ${E(t.sua_boi)}</span></label><input id="ts_${t.khoa}" data-k="${E(t.khoa)}" value="${E(t.gia_tri)}">`).join('')}
+      <button class="nut navy" id="luu" style="margin-top:14px">Lưu</button></div>`;
+    $('luu').onclick = () => lam($('luu'), $('b'), async () => { const o = {}; nd.querySelectorAll('[data-k]').forEach((i) => { const cu = ds.find((t) => t.khoa === i.dataset.k); if (cu.gia_tri !== i.value) o[i.dataset.k] = i.value; }); await F.goi('qtThamSo', o); mo('ts'); });
+  },
+  async nk(nd) { const ds = await F.goi('qtNhatKy'); nd.innerHTML = `<h1>Nhật ký</h1><div class="the cuon"><table><tr><th>Lúc</th><th>Người</th><th>Việc</th><th>Đối tượng</th><th>Chi tiết</th></tr>${ds.map((x) => `<tr><td>${E(String(x.luc).slice(0, 16).replace('T', ' '))}</td><td>${E(x.efc)}</td><td>${E(x.hanh_dong)}</td><td>${E(x.doi_tuong)}</td><td>${E(x.chi_tiet)}</td></tr>`).join('')}</table></div>`; },
+};
+const TOI_LOTRINH = ['Chưa học', 'Đã dự OPP', 'Đã học sản phẩm', 'Đã học chính sách', 'Đã thực hành đo, cài ứng dụng', 'Đã đào tạo thực chiến'];
+(async () => { if (F.phien()) await vao(); else $('manDN').classList.remove('an'); })();
+</script>
+</body></html>
