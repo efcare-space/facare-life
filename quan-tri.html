@@ -28,7 +28,7 @@ td .nut{margin:2px 4px 2px 0}
 </section>
 <div class="khung an" id="khung">
   <nav class="ben" id="ben"></nav>
-  <main class="chinh"><div class="dong" style="border:0;padding:0 0 10px"><div><b id="ten"></b> <span id="vai"></span></div><span><a href="index.html" class="nut phu nho">Mở app</a> <button class="nut phu nho" id="out">Đăng xuất</button></span></div><div id="nd"></div></main>
+  <main class="chinh"><div class="dong" style="border:0;padding:0 0 10px"><div><b id="ten"></b> <span id="vai"></span></div><span><a href="index.html" class="nut phu nho">Mở app</a> <a href="bac-si.html" class="nut phu nho">App Bác sĩ</a> <button class="nut phu nho" id="out">Đăng xuất</button></span></div><div id="nd"></div></main>
 </div>
 <script>
 const F = window.FL, $ = (i) => document.getElementById(i), E = F.esc;
@@ -38,6 +38,7 @@ let TOI = null;
 const MUC = [
   ['don', 'Đơn hàng', ['ke_toan', 'kho', 'gd_kd', 'ban_dh']],
   ['ctv', 'Cộng tác viên', ['hoc_vien', 'gd_kd', 'ban_dh', 'dieu_phoi']],
+  ['pc', 'Phân công bác sĩ', ['dieu_phoi']],
   ['hh', 'Hoa hồng', ['ke_toan', 'gd_kd', 'ban_dh']],
   ['nguoi', 'Người và vai', []],
   ['ts', 'Tham số', []],
@@ -101,6 +102,13 @@ const V = {
     nd.querySelectorAll('[data-buoc]').forEach((s) => s.onchange = () => lam(null, $('b'), async () => { await F.goi('qtGhiBuocHoc', s.dataset.buoc, Number(s.value)); F.bao($('b'), 'Đã ghi bước học.', true); }));
     nd.querySelectorAll('[data-mb]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Xác nhận CTV đã đạt bài kiểm tra và mở bán?')) return; await F.goi('qtMoBan', b.dataset.mb, true); mo('ctv'); }));
     nd.querySelectorAll('[data-td]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Tạm dừng CTV này?')) return; await F.goi('qtMoBan', b.dataset.td, false); mo('ctv'); }));
+  },
+  async pc(nd) {
+    const d = await F.goi('qtKhach');
+    nd.innerHTML = `<h1>Phân công bác sĩ</h1><p class="mo">Bác sĩ chỉ thấy và giao việc cho khách được phân công. ${d.bacSi.length ? '' : 'Chưa có ai mang vai Bác sĩ: gán ở mục Người và vai.'}</p><div id="b"></div>
+      <div class="the cuon"><table><tr><th>Khách</th><th>CTV phụ trách</th><th>Bác sĩ</th></tr>${d.khach.map((k) => `<tr><td><b>${E(k.ten)}</b><br><span class="mo">${E(k.sdt)}</span></td><td>${E(k.ten_ctv || '—')}</td>
+        <td><select data-pc="${E(k.sdt)}"><option value="">— Chưa phân công —</option>${d.bacSi.map((b) => `<option value="${E(b.efc)}" ${b.efc === k.bacSi ? 'selected' : ''}>${E(b.ten)} · ${E(b.efc)}</option>`).join('')}</select></td></tr>`).join('') || '<tr><td colspan="3" class="mo">Chưa có khách.</td></tr>'}</table></div>`;
+    nd.querySelectorAll('[data-pc]').forEach((s) => s.onchange = () => lam(null, $('b'), async () => { await F.goi('qtPhanCongBs', s.dataset.pc, s.value); F.bao($('b'), 'Đã lưu phân công.', true); }));
   },
   async hh(nd, ky) {
     const d = await F.goi('qtHoaHong', ky);
