@@ -21,7 +21,7 @@ td .nut{margin:2px 4px 2px 0}
 </head><body>
 <div id="thu" class="thu an">Kho thử · dữ liệu giả</div>
 <section id="manDN" class="vung an" style="max-width:420px">
-  <div class="logo" style="justify-content:center;margin:30px 0 6px"><span id="lg" style="width:44px;height:44px;display:inline-block"></span><span class="chu-logo" style="font-size:30px"><span class="fa">FaCare</span> <span class="li">Life</span></span></div>
+  <div class="logo" style="justify-content:center;margin:30px 0 6px"><span id="lg" style="width:44px;height:44px;display:inline-block;background:#fff;border-radius:12px;padding:4px"></span><span class="chu-logo" style="font-size:30px"><span class="fa">FaCare</span> <span class="li">Life</span></span></div>
   <p class="mo" style="text-align:center;margin-bottom:16px">Quản trị · dành cho nhân sự được phân quyền</p>
   <div class="the"><label for="s">Số điện thoại</label><input id="s" inputmode="tel"><label for="p">Mã PIN</label><input id="p" type="password" inputmode="numeric" maxlength="6">
     <div id="dnB"></div><button class="nut navy rong" id="dnN" style="margin-top:12px">Đăng nhập</button></div>
@@ -38,6 +38,9 @@ let TOI = null;
 const MUC = [
   ['don', 'Đơn hàng', ['ke_toan', 'kho', 'gd_kd', 'ban_dh']],
   ['ctv', 'Cộng tác viên', ['hoc_vien', 'gd_kd', 'ban_dh', 'dieu_phoi']],
+  ['lead', 'Pipeline lead', ['gd_kd', 'ban_dh', 'dieu_phoi']],
+  ['lop', 'Lịch đào tạo', ['hoc_vien']],
+  ['khoa', 'Khoá học, xác nhận', ['hoc_vien']],
   ['pc', 'Phân công bác sĩ', ['dieu_phoi']],
   ['hh', 'Hoa hồng', ['ke_toan', 'gd_kd', 'ban_dh']],
   ['nguoi', 'Người và vai', []],
@@ -102,6 +105,45 @@ const V = {
     nd.querySelectorAll('[data-buoc]').forEach((s) => s.onchange = () => lam(null, $('b'), async () => { await F.goi('qtGhiBuocHoc', s.dataset.buoc, Number(s.value)); F.bao($('b'), 'Đã ghi bước học.', true); }));
     nd.querySelectorAll('[data-mb]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Xác nhận CTV đã đạt bài kiểm tra và mở bán?')) return; await F.goi('qtMoBan', b.dataset.mb, true); mo('ctv'); }));
     nd.querySelectorAll('[data-td]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Tạm dừng CTV này?')) return; await F.goi('qtMoBan', b.dataset.td, false); mo('ctv'); }));
+  },
+  async lead(nd, loc = '') {
+    const d = await F.goi('qtPipeline'), max = Math.max(1, ...Object.values(d.dem));
+    const ds = d.ds.filter((x) => !loc || (loc === 'qua_han' ? x.quaHan : x.giai_doan === loc));
+    const mau = { moi: '', dang_xu_ly: 'vang', hen_gap: '', chuyen_doi: 'xanh', that_bai: 'do' };
+    nd.innerHTML = `<h1>Pipeline lead toàn hệ thống</h1><p class="mo" style="margin-bottom:12px">Lead do CTV ghi và từ trang giới thiệu. Chuyển đổi tự động khi khách có đơn đã thu tiền.</p>
+      <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><div class="kpi"><span>Tổng lead</span><b>${d.tong}</b></div><div class="kpi"><span>Cơ hội đang mở</span><b>${d.dangMo}</b></div>
+        <div class="kpi"><span>Cần xử lý quá hạn</span><b style="color:var(--do)">${d.quaHan}</b></div><div class="kpi"><span>Doanh thu có bằng chứng</span><b>${F.tien(d.doanhThu)}</b></div></div>
+      <div class="hai" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div class="the"><h2>Pipeline theo trạng thái</h2>${Object.entries(d.giaiDoan).map(([k, t]) => `<div style="margin:8px 0"><div class="dong" style="border:0;padding:0"><span>${E(t)}</span><b>${d.dem[k]}</b></div><div class="thanh-tien"><i style="width:${Math.round(d.dem[k] / max * 100)}%;${k === 'that_bai' ? 'background:var(--do)' : k === 'chuyen_doi' ? '' : 'background:var(--navy)'}"></i></div></div>`).join('')}</div>
+        <div class="the"><h2>Việc cần chú ý</h2>${d.canPhucHoi.slice(0, 8).map((l) => `<div class="dong"><span><b>${E(l.ten)}</b><br><span class="mo">${E(l.ten_ctv || l.ctv)} · ${E(d.giaiDoan[l.giai_doan])}</span></span><span class="nhan do">hẹn ${F.ngay(l.han_follow)}</span></div>`).join('') || '<p class="mo">Không có lead quá hạn.</p>'}</div></div>
+      <div class="loc">${[['', 'Tất cả'], ['qua_han', 'Quá hạn'], ...Object.entries(d.giaiDoan)].map(([k, t]) => `<button data-l="${k}" class="${k === loc ? 'on' : ''}">${E(t)}</button>`).join('')}</div>
+      <div class="the cuon"><table><tr><th>Lead</th><th>Tổ chức</th><th>Nguồn</th><th>CTV</th><th>Trạng thái</th><th>Giá trị</th><th>Hẹn chăm</th></tr>${ds.map((l) => `<tr><td><b>${E(l.ten)}</b><br><span class="mo">${E(l.sdt)}</span></td><td>${E(l.to_chuc || '—')}</td><td>${E(l.nguon)}</td><td>${E(l.ten_ctv || l.ctv)}</td>
+        <td><span class="nhan ${l.quaHan ? 'do' : mau[l.giai_doan]}">${l.quaHan ? 'Quá hạn' : E(d.giaiDoan[l.giai_doan])}</span></td><td class="so">${l.gia_tri ? F.tien(l.gia_tri) : '—'}</td><td>${F.ngay(l.han_follow)}</td></tr>`).join('') || '<tr><td colspan="7" class="mo">Chưa có lead.</td></tr>'}</table></div>`;
+    nd.querySelectorAll('[data-l]').forEach((b) => b.onclick = () => mo('lead', b.dataset.l));
+  },
+  async lop(nd) {
+    const d = await F.goi('qtLop'), hom = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
+    const TT = { dang_ky: ['', 'Đăng ký'], co_mat: ['xanh', 'Có mặt'], vang: ['do', 'Vắng'] };
+    nd.innerHTML = `<h1>Lịch đào tạo</h1><p class="mo">Buổi học hiện trên app CTV để đăng ký. Điểm danh "Có mặt" ở buổi gắn bước học thì bước học của CTV tự ghi nhận.</p><div id="b"></div>
+      <details class="the" style="margin-top:12px"><summary>+ Tạo buổi học</summary><div class="hai" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:6px">
+        <div><label for="lt">Tên buổi</label><input id="lt" placeholder="OPP tháng 11"></div><div><label for="ll">Loại</label><select id="ll">${Object.entries(d.loai).map(([k, t]) => `<option value="${k}">${E(t)}</option>`).join('')}</select></div>
+        <div><label for="lc">Ngày giờ</label><input id="lc" type="datetime-local"></div><div><label for="ld">Địa điểm hoặc link họp</label><input id="ld"></div>
+        <div><label for="lm">Tối đa (0 = không giới hạn)</label><input id="lm" type="number" min="0" value="0"></div><div><label for="lb">Ghi nhận bước học khi có mặt</label><select id="lb"><option value="0">Không gắn bước</option>${d.loTrinh.slice(1).map((t, i) => `<option value="${i + 1}">${i + 1}. ${E(t)}</option>`).join('')}</select></div></div>
+        <button class="nut navy" id="lTao" style="margin-top:12px">Tạo buổi học</button></details>
+      ${d.ds.map((l) => `<div class="the"><div class="dong" style="border:0;padding:0"><span><b>${E(l.ten)}</b> <span class="nhan">${E(d.loai[l.loai] || l.loai)}</span>${String(l.luc).slice(0, 10) < hom ? ' <span class="nhan vang">Đã qua</span>' : ''}<br><span class="mo">${F.ngay(l.luc)} ${String(l.luc).slice(11, 16)} · ${E(l.dia_diem || '')} · ${l.dk.length}${l.toi_da ? '/' + l.toi_da : ''} người${l.buoc ? ' · ghi bước ' + l.buoc : ''}</span></span><button class="nut phu nho" data-huy="${l.id}">Huỷ buổi</button></div>
+        ${l.dk.length ? `<table style="margin-top:6px"><tr><th>Người</th><th>Trạng thái</th><th>Điểm danh</th></tr>${l.dk.map((x) => `<tr><td>${E(x.ten || x.efc)}<br><span class="mo">${E(x.efc)}</span></td><td><span class="nhan ${TT[x.trang_thai] ? TT[x.trang_thai][0] : ''}">${TT[x.trang_thai] ? TT[x.trang_thai][1] : E(x.trang_thai)}</span></td>
+          <td><button class="nut nho" data-dd="${l.id}" data-e="${E(x.efc)}" data-c="1">Có mặt</button><button class="nut phu nho" data-dd="${l.id}" data-e="${E(x.efc)}">Vắng</button></td></tr>`).join('')}</table>` : '<p class="mo">Chưa có người đăng ký.</p>'}</div>`).join('') || '<div class="the mo">Chưa có buổi học.</div>'}`;
+    $('lTao').onclick = () => lam($('lTao'), $('b'), async () => { await F.goi('qtTaoLop', { ten: $('lt').value, loai: $('ll').value, luc: $('lc').value, diaDiem: $('ld').value, toiDa: $('lm').value, buoc: $('lb').value }); mo('lop'); });
+    nd.querySelectorAll('[data-huy]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { if (!confirm('Huỷ buổi học này?')) return; await F.goi('qtHuyLop', Number(b.dataset.huy)); mo('lop'); }));
+    nd.querySelectorAll('[data-dd]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { await F.goi('qtDiemDanh', Number(b.dataset.dd), b.dataset.e, !!b.dataset.c); mo('lop'); }));
+  },
+  async khoa(nd) {
+    const d = await F.goi('qtHoc');
+    nd.innerHTML = `<h1>Khoá học và xác nhận</h1><p class="mo">Lộ trình phát triển 3 tầng trên app CTV. Khoá "Học viện xác nhận" chờ duyệt ở đây.</p><div id="b"></div>
+      <div class="the" style="margin-top:12px"><h2>Chờ xác nhận (${d.cho.length})</h2>${d.cho.length ? `<table><tr><th>Người</th><th>Khoá</th><th>Báo lúc</th><th></th></tr>${d.cho.map((x) => `<tr><td>${E(x.ten || x.efc)}<br><span class="mo">${E(x.efc)}</span></td><td>${E(x.ten_khoa)}</td><td>${F.ngay(x.luc)}</td><td><button class="nut nho" data-xn="${E(x.efc)}" data-m="${E(x.ma_khoa)}" data-d="1">Đạt</button><button class="nut phu nho" data-xn="${E(x.efc)}" data-m="${E(x.ma_khoa)}">Chưa đạt</button></td></tr>`).join('')}</table>` : '<p class="mo">Không có yêu cầu chờ.</p>'}</div>
+      <div class="the cuon"><h2>Danh mục khoá</h2><table><tr><th>Mã</th><th>Tên</th><th>Tầng</th><th>Cách học</th><th>Link tài liệu</th><th></th></tr>${d.khoa.map((k) => `<tr><td>${E(k.ma)}</td><td><input data-ten="${E(k.ma)}" value="${E(k.ten)}"></td><td>${E(d.tang[k.tang] || k.tang)}</td><td>${k.cach === 'tu_hoc' ? 'Tự học' : 'Học viện xác nhận'}</td><td><input data-tl="${E(k.ma)}" value="${E(k.tai_lieu || '')}" placeholder="https://"></td>
+        <td><label class="o-chon" style="margin:0"><input type="checkbox" data-mo="${E(k.ma)}" ${k.mo ? 'checked' : ''}> Mở</label><button class="nut navy nho" data-luu="${E(k.ma)}">Lưu</button></td></tr>`).join('')}</table></div>`;
+    nd.querySelectorAll('[data-xn]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { await F.goi('qtXacNhanHoc', b.dataset.xn, b.dataset.m, !!b.dataset.d); mo('khoa'); }));
+    nd.querySelectorAll('[data-luu]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { const m = b.dataset.luu; await F.goi('qtSuaKhoa', m, { ten: nd.querySelector(`[data-ten="${m}"]`).value, taiLieu: nd.querySelector(`[data-tl="${m}"]`).value, mo: nd.querySelector(`[data-mo="${m}"]`).checked }); F.bao($('b'), 'Đã lưu khoá ' + m + '.', true); }));
   },
   async pc(nd) {
     const d = await F.goi('qtKhach');

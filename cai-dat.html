@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cài FaCare Life</title>
+<meta name="description" content="Hướng dẫn đưa FaCare Life ra màn hình chính điện thoại và đăng nhập bằng tài khoản EFCARE.">
+<meta name="theme-color" content="#233A77">
+<link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="chung.css">
+<script src="chung.js"></script>
+<style>
+.mo-dau{background:linear-gradient(160deg,var(--navy-dam),var(--navy) 55%,#1f4f7a);color:#fff;text-align:center;padding:calc(28px + env(safe-area-inset-top)) 20px 30px}
+.mo-dau img{width:76px;height:76px;border-radius:20px;background:#fff;padding:6px}.mo-dau h1{margin-top:12px;font-size:25px}.mo-dau p{color:#dbe7ff;margin-top:6px}
+ol.cac-buoc{list-style:none;counter-reset:b;margin:0}ol.cac-buoc li{counter-increment:b;position:relative;padding:12px 0 12px 48px;border-bottom:1px solid var(--vien)}ol.cac-buoc li:last-child{border:0}
+ol.cac-buoc li::before{content:counter(b);position:absolute;left:0;top:12px;width:34px;height:34px;border-radius:50%;background:var(--xanh);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+ol.cac-buoc b{display:block}ol.cac-buoc span{color:var(--mo);font-size:15.5px}
+.ic{display:inline-block;min-width:24px;padding:0 6px;border:1px solid var(--vien-o);border-radius:6px;text-align:center;font-weight:700}
+.xong{background:var(--xanh-nhat);color:var(--xanh-dam);border-radius:12px;padding:12px 14px;font-size:15.5px;margin-top:10px}
+#qr{display:flex;justify-content:center;margin:12px 0}#qr img,#qr canvas{width:220px!important;height:220px!important;background:#fff;padding:10px;border-radius:12px}
+.panel{display:none}.panel.on{display:block}
+.app-o{display:grid;gap:10px}.app-o a{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--chu);border:1px solid var(--vien);border-radius:14px;padding:12px;background:var(--the)}
+.app-o a i{flex:0 0 42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;color:#fff}
+.app-o a span{font-size:14px;color:var(--mo);display:block;font-weight:500}
+</style>
+</head><body>
+<header class="mo-dau"><img src="icon-192.png" alt=""><h1>Đưa FaCare Life ra màn hình chính</h1><p>Mở bằng một chạm như ứng dụng. Không tải từ kho ứng dụng, không tốn dung lượng.</p></header>
+<main class="vung" style="padding-bottom:40px">
+  <div class="bao an" id="trongApp"><b>Anh chị đang mở trong Zalo hoặc Facebook.</b><br>Trình duyệt trong các ứng dụng này không cho thêm ra màn hình chính. Bấm <span class="ic">⋯</span> hoặc <span class="ic">⋮</span> ở góc trên bên phải, chọn <b>Mở bằng trình duyệt</b> (Safari trên iPhone, Chrome trên Android).</div>
+
+  <div class="the"><h2>Chọn ứng dụng cần cài</h2>
+    <div class="seg" id="chonApp" style="margin-bottom:10px"><button data-a="app" class="on">App chính</button><button data-a="bs">Bác sĩ</button><button data-a="qt">Quản trị</button></div>
+    <div style="display:flex;gap:8px"><input id="lk" readonly aria-label="Link ứng dụng"><button class="nut phu" id="cp" style="flex:none">Chép</button></div>
+    <div id="qr" role="img" aria-label="Mã QR mở ứng dụng"></div><p class="mo" style="text-align:center" id="qrCap">Quét bằng camera điện thoại để mở.</p></div>
+
+  <div class="seg" id="chonMay" style="margin:16px 0 12px"><button data-p="ios" class="on">iPhone, iPad</button><button data-p="and">Android</button></div>
+  <section class="the panel on" id="ios"><ol class="cac-buoc">
+    <li><b>Mở bằng Safari</b><span>Mở link ở trên bằng Safari (biểu tượng la bàn xanh).</span></li>
+    <li><b>Bấm nút Chia sẻ</b><span>Nút hình vuông có mũi tên lên <span class="ic">⬆︎</span> ở thanh dưới cùng. Trên iPad nút này ở góc trên.</span></li>
+    <li><b>Chọn "Thêm vào MH chính"</b><span>Kéo danh sách lên nếu chưa thấy. Tên có thể là "Thêm vào Màn hình chính".</span></li>
+    <li><b>Bấm "Thêm"</b><span>Ở góc trên bên phải, giữ nguyên tên <b id="tenIos">FaCare Life</b>.</span></li>
+  </ol><div class="xong">✓ Biểu tượng ba lá FaCare Life hiện trên màn hình chính. Từ nay chỉ cần chạm vào đó.</div></section>
+  <section class="the panel" id="and"><ol class="cac-buoc">
+    <li><b>Mở bằng Chrome</b><span>Mở link ở trên bằng Chrome. Nếu máy hiện <b>"Cài đặt ứng dụng"</b>, bấm vào đó là xong.</span></li>
+    <li><b>Bấm nút ba chấm</b><span>Nút <span class="ic">⋮</span> ở góc trên bên phải.</span></li>
+    <li><b>Chọn "Thêm vào màn hình chính"</b><span>Hoặc "Cài đặt ứng dụng", tuỳ máy.</span></li>
+    <li><b>Bấm "Cài đặt" hoặc "Thêm"</b><span>Một số máy hỏi thêm lần nữa, bấm "Thêm".</span></li>
+  </ol><div class="xong">✓ Biểu tượng FaCare Life hiện trên màn hình chính hoặc trong danh sách ứng dụng.</div>
+  <details style="margin-top:10px"><summary>Máy Samsung dùng Samsung Internet</summary><p>Bấm <span class="ic">≡</span> góc dưới bên phải → <b>Thêm trang vào</b> → <b>Màn hình chờ</b> → <b>Thêm</b>.</p></details></section>
+
+  <h2 style="margin:20px 0 8px">Đăng nhập</h2>
+  <div class="the"><ol class="cac-buoc">
+    <li><b>Dùng tài khoản EFCARE</b><span>Một tài khoản (số điện thoại + mã PIN 6 số) dùng chung cho EFCommunity và FaCare Life. Đã có tài khoản EFCommunity thì đăng nhập luôn, không tạo mới.</span></li>
+    <li><b>Chưa có tài khoản</b><span>Bấm <b>"Tạo tài khoản EFCARE"</b>, điền họ tên, số điện thoại, năm sinh, tự đặt mã PIN 6 số.</span></li>
+    <li><b>Chọn mình là ai</b><span><b>Khách hàng</b>: đơn hàng, gói chăm sóc, lịch hẹn. <b>Cộng tác viên</b>: việc, lead, học, bán hàng, mạng lưới, thu nhập.</span></li>
+    <li><b>Đăng ký cộng tác viên</b><span>Chọn "Tôi là cộng tác viên", điền mã người giới thiệu nếu có. Vào học ngay, không chờ duyệt; đạt bài kiểm tra thì được mở bán.</span></li>
+  </ol><div class="xong">Bác sĩ và nhân sự quản trị đăng nhập cùng tài khoản EFCARE. Vai được Ban điều hành gán sẵn.</div></div>
+
+  <div class="app-o" style="margin-top:14px">
+    <a href="./"><i style="background:var(--xanh)">FL</i><div><b>Mở App FaCare Life</b><span>Khách hàng, cộng tác viên</span></div></a>
+    <a href="bac-si.html"><i style="background:var(--navy)">BS</i><div><b>Mở App Bác sĩ</b><span>Theo dõi, giao việc cho khách và CTV</span></div></a>
+    <a href="quan-tri.html"><i style="background:#1f4f7a">QT</i><div><b>Mở Quản trị</b><span>Dành cho nhân sự được phân quyền</span></div></a>
+  </div>
+  <button class="nut phu rong" id="guiHd" style="margin-top:14px">Gửi hướng dẫn này cho người khác</button><div id="msg"></div>
+
+  <h2 style="margin:20px 0 8px">Hay gặp</h2>
+  <details><summary>Quên mã PIN</summary><p>Gọi hotline để được hỗ trợ đặt lại. FaCare Life không giữ mã PIN; mã PIN do hệ thống tài khoản EFCARE quản lý.</p></details>
+  <details><summary>Không thấy "Thêm vào MH chính" trên iPhone</summary><p>Anh chị đang mở trong Zalo, Facebook hoặc trình duyệt khác. Mở lại bằng Safari rồi làm từ bước 1.</p></details>
+  <details><summary>Đăng nhập rồi nhưng không thấy mục Cộng tác viên</summary><p>Chọn "Tôi là cộng tác viên" ở màn đăng nhập, hoặc bấm nút CTV trên đầu trang để đăng ký.</p></details>
+  <details><summary>Có lưu chỉ số sức khỏe không?</summary><p>Không. FaCare Life chỉ lưu thông tin hành chính: họ tên, số điện thoại, đơn hàng, lịch hẹn. Chỉ số sức khỏe xem trên ứng dụng FaCare.</p></details>
+  <details><summary>Có tốn tiền hay dung lượng không?</summary><p>Không. Ứng dụng nhẹ, không qua kho ứng dụng, không thu phí cài đặt.</p></details>
+  <details><summary>Cần người hỗ trợ</summary><p>Gọi hotline EFCARE <b>0815 515 456</b> (08:30–17:30) hoặc nhờ cộng tác viên đang đồng hành.</p></details>
+  <p class="mo" style="text-align:center;margin-top:16px;font-size:13px">FaCare Life · liên doanh FaCare × EFCARE</p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function () {
+  const $ = (i) => document.getElementById(i), F = window.FL;
+  const goc = location.protocol === 'https:' ? new URL('./', location.href).href : 'https://efcare-space.github.io/facare-life/';
+  const ref = new URLSearchParams(location.search).get('ctv');
+  const APP = { app: goc + (ref ? '?ctv=' + encodeURIComponent(ref) : ''), bs: goc + 'bac-si.html', qt: goc + 'quan-tri.html' };
+  const TEN = { app: 'FaCare Life', bs: 'FL Bác sĩ', qt: 'FaCare Life' };
+  let cur = 'app';
+  function ve() {
+    $('lk').value = APP[cur]; $('tenIos').textContent = TEN[cur]; const box = $('qr'); box.innerHTML = '';
+    if (window.QRCode) { try { new QRCode(box, { text: APP[cur], width: 400, height: 400, colorDark: '#233A77', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); } catch (e) { box.textContent = APP[cur]; } } else box.textContent = 'Không tải được mã QR. Dùng link ở trên.';
+    document.querySelectorAll('#chonApp button').forEach((b) => b.classList.toggle('on', b.dataset.a === cur));
+  }
+  document.querySelectorAll('#chonApp button').forEach((b) => b.onclick = () => { cur = b.dataset.a; ve(); });
+  $('cp').onclick = () => { const v = $('lk').value; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => $('cp').textContent = 'Đã chép', () => { $('lk').select(); try { document.execCommand('copy'); $('cp').textContent = 'Đã chép'; } catch (e) {} }); };
+  const ua = navigator.userAgent || '', ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (/Zalo|FBAN|FBAV|FB_IAB|Instagram|Line\//i.test(ua)) $('trongApp').classList.remove('an');
+  function may(p) { document.querySelectorAll('#chonMay button').forEach((b) => b.classList.toggle('on', b.dataset.p === p)); $('ios').classList.toggle('on', p === 'ios'); $('and').classList.toggle('on', p === 'and'); }
+  document.querySelectorAll('#chonMay button').forEach((b) => b.onclick = () => may(b.dataset.p));
+  may(/android/i.test(ua) ? 'and' : 'ios');
+  const t = 'Cài FaCare Life lên điện thoại: ' + location.href.split('#')[0];
+  $('guiHd').onclick = () => { if (navigator.share) navigator.share({ text: t }).catch(() => {}); else if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => F.bao($('msg'), 'Đã chép. Dán vào Zalo để gửi.', true)); };
+  ve();
+})();
+</script>
+</body></html>

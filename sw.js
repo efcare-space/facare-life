@@ -1,6 +1,6 @@
 // FaCare Life · bộ nhớ đệm có phiên bản. Đổi PHIEN_BAN khi đưa bản mới lên.
-const PHIEN_BAN = 'efl-0.2.0';
-const TEP = ['./', 'index.html', 'quan-tri.html', 'bac-si.html', 'chung.js', 'chung.css', 'icon.svg', 'manifest.webmanifest', 'icon-192.png'];
+const PHIEN_BAN = 'efl-0.3.0';
+const TEP = ['./', 'index.html', 'quan-tri.html', 'bac-si.html', 'chung.js', 'chung.css', 'icon.svg', 'manifest.webmanifest', 'icon-192.png', 'cai-dat.html', 'gioi-thieu.html', 'banner/vali.png', 'banner/goi.png', 'banner/ctv.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(PHIEN_BAN).then((c) => c.addAll(TEP)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== PHIEN_BAN).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FaCare Life · Theo dõi sức khỏe cả gia đình</title>
+<meta name="description" content="Vali Y tế Gia Đình, Gói An tâm gia đình có bác sĩ cùng theo dõi. Để lại thông tin để được tư vấn.">
+<meta property="og:title" content="FaCare Life · Theo dõi sức khỏe 365 ngày cùng cả gia đình">
+<meta property="og:description" content="Đo tại nhà, có bác sĩ gia đình cùng theo dõi. Để lại thông tin để được tư vấn miễn phí.">
+<meta property="og:image" content="https://efcare-space.github.io/facare-life/banner/vali.png">
+<meta name="theme-color" content="#233A77">
+<link rel="icon" href="icon.svg"><link rel="stylesheet" href="chung.css">
+<script>window.EFC_URL='https://efc-may-chu.efcare.workers.dev';window.EFL_URL='https://efl-may-chu.efcare.workers.dev';</script>
+<script src="chung.js"></script>
+<style>.anh-the{width:100%;border-radius:16px;display:block;margin-bottom:12px}.y{display:grid;gap:10px}.y div{display:flex;gap:12px;align-items:flex-start}.y i{flex:0 0 34px;height:34px;border-radius:10px;background:var(--xanh-nhat);color:var(--xanh-dam);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800}</style>
+</head><body>
+<header class="dau"><div class="logo"><span class="o-logo" id="lg"></span><span class="chu-logo"><span class="fa">FaCare</span> <span class="li">Life</span></span></div></header>
+<main class="vung" style="padding-bottom:40px">
+  <div class="the an" id="nguoiGt" style="border-color:var(--xanh)"></div>
+  <div class="seg" id="chuDe" style="margin-bottom:14px;overflow-x:auto"></div>
+  <div id="noiDung"></div>
+  <div class="the" id="form"><h2>Để lại thông tin, được tư vấn miễn phí</h2>
+    <label for="t">Họ tên</label><input id="t" autocomplete="name"><label for="s">Số điện thoại</label><input id="s" inputmode="tel" autocomplete="tel">
+    <div id="oToChuc" class="an"><label for="o">Tên doanh nghiệp, trường học</label><input id="o"></div>
+    <label class="o-chon"><input type="checkbox" id="d"> Tôi đồng ý để FaCare Life liên hệ tư vấn qua số điện thoại này.</label><div id="b"></div>
+    <button class="nut rong" id="g">Gửi thông tin</button>
+    <p class="mo" style="margin-top:10px">FaCare Life chỉ dùng số điện thoại để tư vấn, không lưu thông tin y khoa trên trang này.</p></div>
+  <p class="mo" style="text-align:center;margin-top:8px"><a href="https://efcare-space.github.io/cong-ctv/mua/">Xem bảng giá chi tiết</a> · <a href="cai-dat.html">Cài ứng dụng</a></p>
+  <p class="mo" style="text-align:center;margin-top:12px;font-size:13px">Thiết bị hỗ trợ theo dõi sức khỏe tại nhà, không thay thế chẩn đoán và điều trị của bác sĩ. Khi có dấu hiệu cấp cứu, gọi 115.</p>
+</main>
+<script>
+const F = window.FL, $ = (i) => document.getElementById(i), E = F.esc, q = new URLSearchParams(location.search);
+$('lg').innerHTML = F.logo;
+const CTV = (q.get('ctv') || '').toUpperCase();
+const CD = {
+  vali: { ten: 'Vali Y tế', anh: 'banner/vali.png', tieu: 'Đo tại nhà, cả nhà cùng an tâm', y: [['1', 'Máy đo huyết áp, máy đo máu, nhiệt kế, cân: đủ cho cả gia đình theo dõi hằng ngày.'], ['2', 'Chỉ số lưu trên ứng dụng: người thân ở xa cũng theo dõi được khi anh chị cho phép.'], ['3', 'Có người đồng hành đến nhà hướng dẫn cài đặt và đo lần đầu.']] },
+  goi: { ten: 'Gói An tâm', anh: 'banner/goi.png', tieu: 'Có bác sĩ cùng theo dõi 365 ngày', y: [['1', 'Người đồng hành đến nhà hỗ trợ đo 2 lần mỗi tháng.'], ['2', 'Bác sĩ gia đình xem chỉ số, chủ động liên hệ khi cần, nhắc lịch khám định kỳ.'], ['3', 'Giá theo số thành viên, càng nhiều người càng ưu đãi.']] },
+  'doanh-nghiep': { ten: 'Doanh nghiệp', tieu: 'Chăm sóc tại nơi làm việc, an tâm khi trở về nhà', y: [['1', 'Kiosk sức khỏe đặt tại trụ sở, không tính phí lắp đặt, bảo trì.'], ['2', 'Bác sĩ tư vấn khi chỉ số bất thường; doanh nghiệp nhận báo cáo ẩn danh.'], ['3', 'Gói 6 hoặc 12 tháng, theo quy mô nhân sự.']], toChuc: true },
+  'truong-hoc': { ten: 'Trường học', tieu: 'Theo dõi tại trường, tiếp nối chăm sóc tại nhà', y: [['1', 'Kiosk tại trường đo chiều cao, cân nặng, BMI, huyết áp, nhịp tim, thân nhiệt.'], ['2', 'Phụ huynh tự đồng ý tham gia và nhận kết quả qua ứng dụng.'], ['3', 'Trải nghiệm miễn phí trước, đăng ký gói có phí sau nếu thấy phù hợp.']], toChuc: true },
+  ctv: { ten: 'Cơ hội CTV', anh: 'banner/ctv.png', tieu: 'Đồng hành sức khỏe cùng cộng đồng', y: [['1', 'Học bài bản tại Học viện EFCARE, có lộ trình phát triển rõ ràng.'], ['2', 'Đồng hành cùng gia đình, bạn bè trong việc chăm sóc sức khỏe.'], ['3', 'Được kèm cặp từ ngày đầu; chính sách được giới thiệu tại buổi gặp.']], ctv: true },
+};
+let chon = CD[q.get('chu-de')] ? q.get('chu-de') : 'vali';
+function ve() {
+  $('chuDe').innerHTML = Object.entries(CD).map(([k, v]) => `<button class="${k === chon ? 'on' : ''}" data-c="${k}" style="flex:none">${v.ten}</button>`).join('');
+  $('chuDe').querySelectorAll('button').forEach((b) => b.onclick = () => { chon = b.dataset.c; ve(); });
+  const c = CD[chon];
+  $('noiDung').innerHTML = `${c.anh ? `<img class="anh-the" src="${c.anh}" alt="${E(c.tieu)}">` : ''}<div class="the"><h1 style="margin-bottom:12px">${E(c.tieu)}</h1><div class="y">${c.y.map(([n, t]) => `<div><i>${n}</i><span>${E(t)}</span></div>`).join('')}</div></div>`;
+  $('oToChuc').classList.toggle('an', !c.toChuc);
+  $('g').textContent = c.ctv ? 'Đăng ký tìm hiểu cơ hội' : 'Gửi thông tin';
+}
+ve();
+(async () => { if (!CTV) return; try { const c = await F.goi('gioiThieuCtv', CTV); if (c) { $('nguoiGt').classList.remove('an'); $('nguoiGt').innerHTML = `<p class="mo">Người giới thiệu</p><b>${E(c.ten)}</b> <span class="nhan xanh">Cộng tác viên FaCare Life</span><p class="mo" style="margin-top:6px">Sau khi anh chị gửi thông tin, ${E(c.ten)} sẽ liên hệ tư vấn.</p>`; } } catch (e) {} })();
+$('g').onclick = async () => {
+  $('g').disabled = true; F.bao($('b'), '');
+  try { await F.goi('dangKyTuVan', { ctv: CTV, ten: $('t').value, sdt: $('s').value, toChuc: $('o').value, chuDe: CD[chon].ten, dongY: $('d').checked });
+    $('form').innerHTML = `<h2>Đã nhận thông tin</h2><p class="mo">Cảm ơn anh chị. Người tư vấn sẽ liên hệ trong giờ hành chính.</p>${CD[chon].ctv ? '<a class="nut rong" style="margin-top:12px" href="index.html' + (CTV ? '?ctv=' + encodeURIComponent(CTV) : '') + '">Tạo tài khoản và đăng ký cộng tác viên</a>' : ''}`;
+  } catch (e) { F.bao($('b'), e.message); } finally { if ($('g')) $('g').disabled = false; }
+};
+</script>
+</body></html>
