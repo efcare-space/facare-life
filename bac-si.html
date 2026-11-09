@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#233A77">
 <link rel="manifest" href="manifest-bac-si.webmanifest">
 <link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="chung.css?v=0.4.0">
+<link rel="stylesheet" href="chung.css?v=0.5.0">
 <script>window.EFC_URL='https://efc-may-chu.efcare.workers.dev';window.EFL_URL='https://efl-may-chu.efcare.workers.dev';</script>
-<script src="chung.js?v=0.4.0"></script>
+<script src="chung.js?v=0.5.0"></script>
 <style>.nhan.navy{background:var(--navy);color:#fff}.khach-the{cursor:pointer}.khach-the:hover{border-color:var(--xanh)}.chi-so{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}</style>
 </head><body>
 <div id="thu" class="thu an">Kho thử · dữ liệu giả</div>
@@ -47,11 +47,11 @@ const ngay = (s) => F.ngay(s);
 const V = {
   async 'theo-doi'(nd) {
     D = await F.goi('bsTongQuan');
-    const ut = D.khach.slice().sort((a, b) => (b.canTheoDoi - a.canTheoDoi) || (b.viecQuaHan - a.viecQuaHan));
+    const ut = D.khach.slice().sort((a, b) => (b.canTheoDoi - a.canTheoDoi) || (b.viecQuaHan - a.viecQuaHan) || (b.viecSapHan - a.viecSapHan));
     nd.innerHTML = `<h1>Khách được phân công</h1><p class="mo" style="margin:4px 0 12px">${D.khach.length} khách · ${D.khach.filter((x) => x.canTheoDoi).length} cần theo dõi · ${D.khach.reduce((s, x) => s + x.viecQuaHan, 0)} việc quá hạn</p>
       ${ut.map((k) => `<div class="the khach-the" data-k="${E(k.sdt)}"><div class="dong" style="border:0;padding:0"><b>${E(k.ten)}</b>${k.canTheoDoi ? '<span class="nhan vang">Cần theo dõi</span>' : ''}</div>
         <p class="mo">CTV: ${E(k.ctv || 'chưa có')}${k.maFaCare ? ' · mã FaCare ' + E(k.maFaCare) : ''}</p>
-        <div class="chi-so"><span class="nhan">${k.viecMo} việc mở</span>${k.viecQuaHan ? `<span class="nhan do">${k.viecQuaHan} quá hạn</span>` : ''}<span class="nhan ${k.goiThang >= D.hanMuc.goiThang ? 'do' : 'xanh'}">Gọi ${k.goiThang}/${D.hanMuc.goiThang} tháng này</span><span class="nhan">Nhắn ${k.nhanHomNay}/${D.hanMuc.nhanNgay} hôm nay</span></div>
+        <div class="chi-so"><span class="nhan">${k.viecMo} việc mở</span>${k.viecQuaHan ? `<span class="nhan do">${k.viecQuaHan} quá hạn</span>` : ''}${k.viecSapHan ? `<span class="nhan vang">${k.viecSapHan} sắp đến hạn</span>` : ''}<span class="nhan ${k.goiThang >= D.hanMuc.goiThang ? 'do' : 'xanh'}">Gọi ${k.goiThang}/${D.hanMuc.goiThang} tháng này</span><span class="nhan">Nhắn ${k.nhanHomNay}/${D.hanMuc.nhanNgay} hôm nay</span></div>
         <p class="mo" style="margin-top:6px">Liên hệ gần nhất: ${k.lanLienHe ? ngay(k.lanLienHe) : 'chưa có'}</p></div>`).join('') || '<div class="the"><p class="mo">Chưa có khách được phân công. Điều phối chăm sóc sẽ phân khách cho bác sĩ.</p></div>'}
       <p class="mo">Chỉ số sức khỏe của khách xem trên hệ thống FaCare (theo mã FaCare). FaCare Life không lưu thông tin y khoa.</p>`;
     nd.querySelectorAll('[data-k]').forEach((x) => x.onclick = () => mo('khach', x.dataset.k));
@@ -64,6 +64,9 @@ const V = {
       <p class="mo">${E(k.sdt)} · CTV ${E(k.ctv || 'chưa có')}${k.ctvSdt ? ' (' + E(k.ctvSdt) + ')' : ''}${k.maFaCare ? ' · mã FaCare <b>' + E(k.maFaCare) + '</b>' : ''}</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><a class="nut navy nho" href="tel:${E(k.sdt)}">Gọi khách</a>${k.ctvSdt ? `<a class="nut phu nho" href="tel:${E(k.ctvSdt)}">Gọi CTV</a>` : ''}
         <button class="nut phu nho" id="co">${k.canTheoDoi ? 'Bỏ đánh dấu theo dõi' : 'Đánh dấu cần theo dõi'}</button></div><div id="b"></div>
+      <div class="the"><h2>Bản tin tháng</h2><p class="mo">Tổng hợp từ nhật ký liên hệ, việc đã làm và lịch sắp tới — không đọc chỉ số sức khỏe. Gửi tay qua gọi điện hoặc Zalo.</p>
+        <button class="nut phu nho" id="btXem">Xem bản tin tháng này</button>
+        <div id="btKhung" class="an" style="margin-top:10px"><textarea id="btVb" rows="5" readonly></textarea><button class="nut rong" id="btChep" style="margin-top:8px">Chép bản tin</button></div></div>
       <div class="the"><h2>Giao việc cho CTV</h2><label for="gL">Loại việc</label><select id="gL">${D.loaiViec.map((x) => `<option>${E(x)}</option>`).join('')}</select>
         <div class="hai"><div><label for="gH">Hạn</label><input id="gH" type="date" value="${E(hom)}"></div><div><label class="o-chon" style="margin-top:34px"><input type="checkbox" id="gU"> Ưu tiên</label></div></div>
         <label for="gG">Ghi chú hành chính (không ghi chỉ số, chẩn đoán, thuốc)</label><input id="gG" maxlength="120" placeholder="Ví dụ: hẹn buổi sáng, gọi trước khi đến">
@@ -76,6 +79,8 @@ const V = {
       <div class="the"><h2>Đơn, gói của khách</h2>${c.don.map((d) => `<div class="dong"><span>${E(d.ma)}<br><span class="mo">${E(d.sp)}</span></span><span>${F.TT[d.trang_thai]}</span></div>`).join('') || '<p class="mo">Chưa có.</p>'}</div>`;
     $('ve').onclick = () => mo('theo-doi');
     $('co').onclick = () => lam($('co'), $('b'), async () => { await F.goi('bsDanhDau', sdt, !k.canTheoDoi); D = null; mo('khach', sdt); });
+    $('btXem').onclick = () => lam($('btXem'), $('b'), async () => { const bt = await F.goi('bsBanTin', sdt); $('btVb').value = bt.vanBan; $('btKhung').classList.remove('an'); $('btChep').textContent = 'Chép bản tin'; });
+    $('btChep').onclick = () => { const v = $('btVb').value; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => $('btChep').textContent = 'Đã chép', () => { $('btVb').select(); try { document.execCommand('copy'); $('btChep').textContent = 'Đã chép'; } catch (e) {} }); };
     $('gN').onclick = () => lam($('gN'), $('b'), async () => { await F.goi('bsGiaoViec', { khachSdt: sdt, loai: $('gL').value, han: $('gH').value, uuTien: $('gU').checked, ghiChu: $('gG').value }); D = null; mo('khach', sdt); });
     $('lN').onclick = () => lam($('lN'), $('b'), async () => { await F.goi('bsGhiLienHe', { khachSdt: sdt, kenh: $('lK').value, phut: $('lP').value, ketQua: $('lQ').value }); D = null; mo('khach', sdt); });
   },
@@ -87,7 +92,7 @@ const V = {
   async ctv(nd) {
     const ds = await F.goi('bsCtv');
     nd.innerHTML = `<h1>Cộng tác viên</h1><p class="mo" style="margin-bottom:12px">CTV đang chăm sóc khách của bác sĩ.</p>` + (ds.map((c) => { const tl = c.xong ? Math.round(c.dungHan / c.xong * 100) : 0; return `<div class="the"><div class="dong" style="border:0;padding:0"><b>${E(c.ten || c.efc)}</b>${c.sdt ? `<a class="nut phu nho" href="tel:${E(c.sdt)}">Gọi</a>` : ''}</div>
-      <div class="chi-so"><span class="nhan">${c.soKhach} khách</span><span class="nhan">${c.xong}/${c.giao} việc xong</span><span class="nhan ${tl >= 80 ? 'xanh' : 'vang'}">${tl}% đúng hạn</span>${c.quaHan ? `<span class="nhan do">${c.quaHan} quá hạn</span>` : ''}</div></div>`; }).join('') || '<div class="the mo">Chưa có.</div>');
+      <div class="chi-so"><span class="nhan">${c.soKhach} khách</span><span class="nhan">${c.xong}/${c.giao} việc xong</span><span class="nhan ${tl >= 80 ? 'xanh' : 'vang'}">${tl}% đúng hạn</span>${c.quaHan ? `<span class="nhan do">${c.quaHan} quá hạn</span>` : ''}${c.gioPhanHoiTb != null ? `<span class="nhan">Phản hồi TB ${c.gioPhanHoiTb} giờ</span>` : ''}</div></div>`; }).join('') || '<div class="the mo">Chưa có.</div>');
   },
   async toi(nd) {
     nd.innerHTML = `<h1>Tài khoản</h1><div class="the"><div class="dong"><span>Họ tên</span><b>${E(TOI.ten)}</b></div><div class="dong"><span>Mã EFCARE</span><b>${E(TOI.efc)}</b></div><div class="dong"><span>Vai</span><span>${TOI.tenVai.map((v) => `<span class="nhan">${E(v)}</span>`).join(' ')}</span></div></div>
