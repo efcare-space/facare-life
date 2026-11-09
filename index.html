@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>FaCare Life</title>
 <meta name="theme-color" content="#009574">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="chung.css?v=0.3.1">
+<link rel="stylesheet" href="chung.css?v=0.4.0">
 <script>window.EFC_URL='https://efc-may-chu.efcare.workers.dev';window.EFL_URL='https://efl-may-chu.efcare.workers.dev'; /* DAN_URL_MAY_CHU_FACARE_LIFE */</script>
-<script src="chung.js?v=0.3.1"></script>
+<script src="chung.js?v=0.4.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head><body>
 <div id="thu" class="thu an">Kho thử · dữ liệu giả</div>
@@ -82,6 +82,7 @@ $('tNut').onclick = () => lam($('tNut'), $('tBao'), async () => { await F.taoTai
 
 async function vao() {
   try { TOI = await F.goi('toi'); } catch (e) { return hienDangNhap(); }
+  try { const h = new Date().toISOString().slice(0, 10); if (localStorage.getItem('efl-mo') !== h) { localStorage.setItem('efl-mo', h); F.suKien('mo_app', { app: 'app', trang: 'app' }); } } catch (e) {}
   $('manDangNhap').classList.add('an'); ['dau', 'noiDung', 'duoi'].forEach((i) => $(i).classList.remove('an'));
   const coCtv = !!TOI.ctv; $('chuyen').classList.toggle('an', !coCtv); $('denQT').classList.toggle('an', !TOI.laNhanVien); $('denBS').classList.toggle('an', !TOI.laBacSi);
   if (KG === 'ctv' && !coCtv) return veDangKyCtv();
@@ -108,6 +109,20 @@ const theDon = (d, xemCtv) => `<div class="the"><div class="dong" style="border:
   ${xemCtv && d.trang_thai === 'moi' ? `<button class="nut phu nho" data-huy="${E(d.ma)}" style="margin-top:8px">Huỷ đơn (khách không mua)</button>` : ''}</div>`;
 
 // ---- Không gian Khách hàng ----
+// Thông báo trên ứng dụng (GĐ0: lưu đăng ký; gửi đẩy ở GĐ2)
+async function batThongBao() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('Máy này chưa nhận được thông báo. Trên iPhone, thêm FaCare Life ra màn hình chính trước (iOS 16.4 trở lên).');
+  if (await Notification.requestPermission() !== 'granted') throw new Error('Anh chị chưa cho phép thông báo trong cài đặt của máy.');
+  const reg = await navigator.serviceWorker.ready, b = F.VAPID.replace(/-/g, '+').replace(/_/g, '/');
+  const key = Uint8Array.from(atob(b + '='.repeat((4 - b.length % 4) % 4)), (c) => c.charCodeAt(0));
+  const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+  await F.goi('dangKyDay', sub.toJSON());
+}
+async function tatThongBao() {
+  let ep = '';
+  try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { ep = sub.endpoint; await sub.unsubscribe(); } } catch (e) {}
+  if (ep) await F.goi('huyDay', ep); else await F.goi('datDongY', 'qb_app', false);
+}
 const KHACH = {
   async tong(nd) {
     const d = await F.goi('khachTongQuan'), cho = d.don.filter((x) => x.trang_thai === 'moi');
@@ -131,10 +146,19 @@ const KHACH = {
   },
   async dongy(nd) {
     const d = await F.goi('khachTongQuan');
+    const nhom = [['Liên hệ, đơn hàng, chăm sóc', ['lien_he', 'xu_ly_don', 'cham_soc', 'chia_se_facare']], ['Nhận tin chương trình, ưu đãi', ['qb_app', 'qb_zalo', 'qb_sms', 'qb_email']]];
     nd.innerHTML = `<h1>Dữ liệu của tôi</h1><p class="mo" style="margin-bottom:12px">Bật hoặc tắt từng mục. FaCare Life chỉ lưu thông tin hành chính (họ tên, số điện thoại, đơn hàng, lịch hẹn), không lưu thông tin y khoa.</p>
-      <div class="the">${Object.entries(d.mucDich).map(([k, t]) => `<label class="o-chon" style="justify-content:space-between"><span>${E(t)}</span><input type="checkbox" data-dy="${k}" ${d.dongY[k] ? 'checked' : ''}></label>`).join('')}<div id="dyBao"></div></div>`;
-    nd.querySelectorAll('[data-dy]').forEach((c) => c.onchange = async () => { try { await F.goi('datDongY', c.dataset.dy, c.checked); F.bao($('dyBao'), 'Đã lưu.', true); } catch (e) { c.checked = !c.checked; F.bao($('dyBao'), e.message); } });
+      ${nhom.map(([t, ds]) => `<div class="the"><h2>${t}</h2>${ds.filter((k) => d.mucDich[k]).map((k) => `<label class="o-chon" style="justify-content:space-between"><span>${E(d.mucDich[k])}</span><input type="checkbox" data-dy="${k}" ${d.dongY[k] ? 'checked' : ''}></label>`).join('')}
+        ${t.startsWith('Nhận') ? '<p class="mo" style="font-size:14px">Tối đa 2 tin mỗi tuần, không gửi từ 21:00 đến 08:00. Thông báo trên ứng dụng: trên iPhone cần thêm FaCare Life ra màn hình chính trước.</p>' : ''}</div>`).join('')}<div id="dyBao"></div>`;
+    nd.querySelectorAll('[data-dy]').forEach((c) => c.onchange = async () => {
+      try {
+        if (c.dataset.dy === 'qb_app') await (c.checked ? batThongBao() : tatThongBao());
+        else await F.goi('datDongY', c.dataset.dy, c.checked);
+        F.bao($('dyBao'), 'Đã lưu.', true);
+      } catch (e) { c.checked = !c.checked; F.bao($('dyBao'), e.message); }
+    });
   },
+
 };
 
 // ---- Đăng ký CTV ----

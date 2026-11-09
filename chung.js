@@ -6,8 +6,12 @@
   const KHOA = 'efl-phien' + (THU ? '-thu' : '');
   const doc = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const ghi = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} };
+  // ---- Tầng dữ liệu Marketing GĐ0: mã thiết bị ẩn danh + nguồn (UTM, mã giới thiệu). Gửi kèm mọi yêu cầu, máy chủ gộp vào SĐT/EF-ID khi người dùng để lại thông tin.
+  let AD = doc('efl-ad'); if (!AD) { AD = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); ghi('efl-ad', AD); }
+  const NG = (() => { const o = {}; ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach((k) => { if (q.get(k)) o[k] = q.get(k).slice(0, 60); }); if (q.get('ctv')) o.ma_gt = q.get('ctv').slice(0, 20);
+    if (Object.keys(o).length) { ghi('efl-ng', JSON.stringify(o)); return o; } try { return JSON.parse(doc('efl-ng') || '{}'); } catch (e) { return {}; } })();
   async function post(url, body) {
-    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(body) });
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(url === EFL ? Object.assign({ ad: AD, ng: NG }, body) : body) });
     return r.json();
   }
   const F = window.FL = {
@@ -23,6 +27,10 @@
       if (!r.ok) throw new Error(r.error || 'Có lỗi.');
       return r.data;
     },
+    // Ghi sự kiện công khai (xem trang, bấm link, mở app). Lỗi mạng bỏ qua, không làm phiền người dùng.
+    suKien(ten, p) { post(EFL, { fn: 'ghiSuKien', args: [Object.assign({ ten }, p || {})] }).catch(() => {}); },
+    nguon: () => NG,
+    VAPID: 'BE1ALVp44sX7WTNWEeHAdcK-_CSibVAsx52xf6nHzGu9ibfFqaJ1bV9jiI5ptdXjpht3omcdQbw_g8MVebuglyM',
     tien: (n) => (Math.round(Number(n) || 0)).toLocaleString('vi-VN') + 'đ',
     esc: (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
     ngay: (iso) => (iso ? String(iso).slice(0, 10).split('-').reverse().join('/') : ''),

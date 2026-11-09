@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FaCare Life · Quản trị</title>
+<meta name="robots" content="noindex">
 <meta name="theme-color" content="#233A77">
 <link rel="icon" href="icon.svg">
-<link rel="stylesheet" href="chung.css?v=0.3.1">
+<link rel="stylesheet" href="chung.css?v=0.4.0">
 <style>
 .khung{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 @media(max-width:820px){.khung{grid-template-columns:1fr}.ben{position:static!important;height:auto!important;display:flex;overflow-x:auto;gap:4px;padding:8px!important}.ben button{flex:none}}
@@ -17,7 +18,7 @@
 td .nut{margin:2px 4px 2px 0}
 </style>
 <script>window.EFC_URL='https://efc-may-chu.efcare.workers.dev';window.EFL_URL='https://efl-may-chu.efcare.workers.dev'; /* DAN_URL_MAY_CHU_FACARE_LIFE */</script>
-<script src="chung.js?v=0.3.1"></script>
+<script src="chung.js?v=0.4.0"></script>
 </head><body>
 <div id="thu" class="thu an">Kho thử · dữ liệu giả</div>
 <section id="manDN" class="vung an" style="max-width:420px">
@@ -41,6 +42,7 @@ const MUC = [
   ['lead', 'Pipeline lead', ['gd_kd', 'ban_dh', 'dieu_phoi']],
   ['lop', 'Lịch đào tạo', ['hoc_vien']],
   ['khoa', 'Khoá học, xác nhận', ['hoc_vien']],
+  ['mk', 'Marketing', ['marketing', 'gd_kd', 'ban_dh']],
   ['pc', 'Phân công bác sĩ', ['dieu_phoi']],
   ['hh', 'Hoa hồng', ['ke_toan', 'gd_kd', 'ban_dh']],
   ['nguoi', 'Người và vai', []],
@@ -145,6 +147,13 @@ const V = {
     nd.querySelectorAll('[data-xn]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { await F.goi('qtXacNhanHoc', b.dataset.xn, b.dataset.m, !!b.dataset.d); mo('khoa'); }));
     nd.querySelectorAll('[data-luu]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => { const m = b.dataset.luu; await F.goi('qtSuaKhoa', m, { ten: nd.querySelector(`[data-ten="${m}"]`).value, taiLieu: nd.querySelector(`[data-tl="${m}"]`).value, mo: nd.querySelector(`[data-mo="${m}"]`).checked }); F.bao($('b'), 'Đã lưu khoá ' + m + '.', true); }));
   },
+  async mk(nd) {
+    nd.innerHTML = `<h1>Marketing</h1><p class="mo">Dữ liệu tương tác, không có dữ liệu y khoa. Chiến dịch: Marketing tạo, GĐ KD hoặc Ban điều hành duyệt; chỉ gửi người đã đồng ý đúng kênh.</p>
+      <div class="loc" style="margin:12px 0">${[['tq', 'Tổng quan dữ liệu'], ['hs', 'Hồ sơ và nhóm'], ['cd', 'Chiến dịch']].map(([k, t]) => `<button data-mk="${k}" class="${MK === k ? 'on' : ''}">${t}</button>`).join('')}</div><div id="b"></div><div id="mkNd"><p class="mo">Đang tải…</p></div>`;
+    nd.querySelectorAll('[data-mk]').forEach((b) => b.onclick = () => { MK = b.dataset.mk; mo('mk'); });
+    const el = $('mkNd');
+    try { await MKV[MK](el); } catch (e) { el.innerHTML = `<div class="bao">${E(e.message)}</div>`; }
+  },
   async pc(nd) {
     const d = await F.goi('qtKhach');
     nd.innerHTML = `<h1>Phân công bác sĩ</h1><p class="mo">Bác sĩ chỉ thấy và giao việc cho khách được phân công. ${d.bacSi.length ? '' : 'Chưa có ai mang vai Bác sĩ: gán ở mục Người và vai.'}</p><div id="b"></div>
@@ -163,7 +172,7 @@ const V = {
     if ($('khoa')) $('khoa').onclick = () => lam($('khoa'), $('b'), async () => { if (!confirm('Chốt kỳ ' + d.ky + '? Sau khi chốt, đơn trả lại sẽ ghi điều chỉnh vào kỳ sau.')) return; await F.goi('qtKhoaKy', d.ky); mo('hh', d.ky); });
   },
   async nguoi(nd, tim = '') {
-    const ds = await F.goi('qtNguoi', tim), VAI = { ke_toan: 'Kế toán', kho: 'Kho, giao vận', hoc_vien: 'Học viện', dieu_phoi: 'Điều phối chăm sóc', gd_kd: 'GĐ Kinh doanh', ban_dh: 'Ban điều hành', bac_si: 'Bác sĩ', quan_ly: 'Quản lý L1–L5', super_admin: 'Super Admin' };
+    const ds = await F.goi('qtNguoi', tim), VAI = { ke_toan: 'Kế toán', kho: 'Kho, giao vận', hoc_vien: 'Học viện', dieu_phoi: 'Điều phối chăm sóc', gd_kd: 'GĐ Kinh doanh', ban_dh: 'Ban điều hành', marketing: 'Marketing', bac_si: 'Bác sĩ', quan_ly: 'Quản lý L1–L5', super_admin: 'Super Admin' };
     nd.innerHTML = `<h1>Người và vai</h1><p class="mo">Người cần đăng nhập FaCare Life một lần bằng tài khoản EFCARE trước khi gán vai.</p>
       <div class="loc"><input id="tim" placeholder="Tìm tên, SĐT, mã EFC" value="${E(tim)}" style="max-width:280px"><button id="timN">Tìm</button></div><div id="b"></div>
       <div class="the cuon"><table><tr><th>Người</th><th>Vai</th><th>Gán thêm</th></tr>${ds.map((n) => `<tr><td><b>${E(n.ten)}</b><br><span class="mo">${E(n.efc)} · ${E(n.sdt)}</span></td>
@@ -181,6 +190,103 @@ const V = {
     $('luu').onclick = () => lam($('luu'), $('b'), async () => { const o = {}; nd.querySelectorAll('[data-k]').forEach((i) => { const cu = ds.find((t) => t.khoa === i.dataset.k); if (cu.gia_tri !== i.value) o[i.dataset.k] = i.value; }); await F.goi('qtThamSo', o); mo('ts'); });
   },
   async nk(nd) { const ds = await F.goi('qtNhatKy'); nd.innerHTML = `<h1>Nhật ký</h1><div class="the cuon"><table><tr><th>Lúc</th><th>Người</th><th>Việc</th><th>Đối tượng</th><th>Chi tiết</th></tr>${ds.map((x) => `<tr><td>${E(String(x.luc).slice(0, 16).replace('T', ' '))}</td><td>${E(x.efc)}</td><td>${E(x.hanh_dong)}</td><td>${E(x.doi_tuong)}</td><td>${E(x.chi_tiet)}</td></tr>`).join('')}</table></div>`; },
+};
+
+// ---------- Marketing (GĐ0–GĐ1) ----------
+let MK = 'tq', DK = [], TRUONG = null, BAC = null;
+const KENH_TEN = { app: 'Thông báo app', zalo: 'Zalo', sms: 'SMS', email: 'Email' };
+const TT_CD = { nhap: ['', 'Nháp'], cho_duyet: ['vang', 'Chờ duyệt'], da_duyet: ['xanh', 'Đã duyệt'], da_chay: ['navy', 'Đã chạy'] };
+const thanh = (n, max, mau) => `<div class="thanh-tien"><i style="width:${max ? Math.round(n / max * 100) : 0}%;${mau ? 'background:' + mau : ''}"></i></div>`;
+function oGiaTri(d, i) {
+  const opt = (ds) => `<select data-gt="${i}">${ds.map(([v, t]) => `<option value="${E(v)}" ${String(d.giaTri) === String(v) ? 'selected' : ''}>${E(t)}</option>`).join('')}</select>`;
+  if (d.truong === 'bac') return opt(Object.entries(BAC).filter(([k]) => k[0] === 'J').map(([k, t]) => [k, k + ' · ' + t]));
+  if (d.truong === 'bacLL') return opt(Object.entries(BAC).filter(([k]) => k[0] === 'L').map(([k, t]) => [k, k + ' · ' + t]));
+  if (['laKhach', 'laLead', 'laCtv', 'coCtv'].includes(d.truong)) return opt([['true', 'Có'], ['false', 'Không']]);
+  if (d.truong === 'goi') return opt([['dang_dung', 'Đang dùng'], ['sap_het', 'Sắp hết (30 ngày)'], ['het_han', 'Đã hết hạn'], ['chua_co', 'Chưa có']]);
+  if (d.truong === 'dongYKenh') return opt(Object.entries(KENH_TEN));
+  return `<input data-gt="${i}" value="${E(d.giaTri)}" style="min-height:40px">`;
+}
+function oPhep(d, i) {
+  const ds = ['bac', 'bacLL'].includes(d.truong) ? [['gte', 'từ bậc'], ['eq', 'đúng bậc'], ['lte', 'tới bậc']] : ['ngayTuMuaCuoi', 'tongChi', 'khongHoatDongNgay'].includes(d.truong) ? [['gte', '≥'], ['lte', '≤']] : [['eq', 'là']];
+  return `<select data-ph="${i}">${ds.map(([v, t]) => `<option value="${v}" ${d.phep === v ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
+}
+function veDieuKien(el, sau) {
+  el.innerHTML = DK.map((d, i) => `<div style="display:grid;grid-template-columns:1.4fr .8fr 1.2fr auto;gap:6px;margin:6px 0"><select data-tr="${i}">${Object.entries(TRUONG).map(([k, t]) => `<option value="${k}" ${d.truong === k ? 'selected' : ''}>${E(t)}</option>`).join('')}</select>${oPhep(d, i)}${oGiaTri(d, i)}<button class="nut phu nho" data-xo="${i}">×</button></div>`).join('')
+    + '<button class="nut phu nho" id="dkThem">+ Thêm điều kiện</button>';
+  const doc = () => DK.forEach((d, i) => { d.phep = el.querySelector(`[data-ph="${i}"]`).value; const g = el.querySelector(`[data-gt="${i}"]`).value; d.giaTri = g === 'true' ? true : g === 'false' ? false : g; });
+  el.querySelectorAll('[data-tr]').forEach((x) => x.onchange = () => { doc(); const i = +x.dataset.tr; DK[i] = { truong: x.value, phep: ['bac', 'bacLL'].includes(x.value) ? 'gte' : ['ngayTuMuaCuoi', 'tongChi', 'khongHoatDongNgay'].includes(x.value) ? 'gte' : 'eq', giaTri: '' }; veDieuKien(el, sau); });
+  el.querySelectorAll('[data-ph],[data-gt]').forEach((x) => x.onchange = doc);
+  el.querySelectorAll('[data-xo]').forEach((x) => x.onclick = () => { doc(); DK.splice(+x.dataset.xo, 1); veDieuKien(el, sau); });
+  $('dkThem').onclick = () => { doc(); DK.push({ truong: 'laLead', phep: 'eq', giaTri: true }); veDieuKien(el, sau); };
+  el.docDK = doc;
+}
+const MKV = {
+  async tq(el) {
+    const d = await F.goi('qtMkTongQuan'); BAC = d.bac;
+    const J = Object.keys(d.bac).filter((k) => k[0] === 'J'), L = Object.keys(d.bac).filter((k) => k[0] === 'L');
+    const mJ = Math.max(1, ...J.map((k) => d.demBac[k])), mL = Math.max(1, ...L.map((k) => d.demBac[k]));
+    el.innerHTML = `<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))"><div class="kpi"><span>Hồ sơ gộp</span><b>${d.soHoSo}</b></div><div class="kpi"><span>Khách</span><b>${d.soKhach}</b></div><div class="kpi"><span>Lead</span><b>${d.soLead}</b></div><div class="kpi"><span>CTV</span><b>${d.soCtv}</b></div></div>
+      <div class="the"><h2>Đồng ý nhận tin theo kênh</h2><p class="mo">Chỉ những người này được đưa vào chiến dịch của kênh tương ứng. Giờ yên lặng ${E(d.gioYenLang)} · tối đa ${E(d.tanSuat)} tin/người/7 ngày.</p>
+        <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-top:10px">${Object.entries(KENH_TEN).map(([k, t]) => `<div class="kpi"><span>${t}</span><b>${d.dongY[k]}</b></div>`).join('')}<div class="kpi"><span>Đồng ý liên hệ tư vấn</span><b>${d.dongYLienHe}</b></div><div class="kpi"><span>Máy đã bật thông báo</span><b>${d.dangKyDay}</b></div></div></div>
+      <div class="hai" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+        <div class="the"><h2>Hành trình khách J1–J8</h2>${J.map((k) => `<div style="margin:6px 0"><div class="dong" style="border:0;padding:0"><span>${k} · ${E(d.bac[k])}</span><b>${d.demBac[k]}</b></div>${thanh(d.demBac[k], mJ, 'var(--navy)')}</div>`).join('')}</div>
+        <div class="the"><h2>Hành trình CTV L1–L8</h2>${L.map((k) => `<div style="margin:6px 0"><div class="dong" style="border:0;padding:0"><span>${k} · ${E(d.bac[k])}</span><b>${d.demBac[k]}</b></div>${thanh(d.demBac[k], mL)}</div>`).join('')}</div></div>
+      <div class="the cuon"><h2>Nguồn 30 ngày (UTM)</h2><table><tr><th>Nguồn</th><th>Chiến dịch</th><th>Lượt</th><th>Người đã để lại SĐT</th></tr>${d.nguon.map((x) => `<tr><td>${E(x.nguon)}</td><td>${E(x.chien_dich)}</td><td class="so">${x.luot}</td><td class="so">${x.nguoi}</td></tr>`).join('') || '<tr><td colspan="4" class="mo">Chưa có lượt vào có gắn nguồn.</td></tr>'}</table>
+        <p class="mo" style="margin-top:8px">Gắn link: <code>gioi-thieu.html?chu-de=goi&utm_source=facebook&utm_medium=bai_dang&utm_campaign=ten-chien-dich</code></p></div>
+      <div class="the cuon"><h2>Sự kiện 30 ngày</h2><table><tr><th>Sự kiện</th><th>Bậc</th><th>Lượt</th></tr>${d.suKien.map((x) => `<tr><td>${E(x.ten)}</td><td>${E(x.bac || '—')}</td><td class="so">${x.luot}</td></tr>`).join('') || '<tr><td colspan="3" class="mo">Chưa có sự kiện.</td></tr>'}</table></div>`;
+  },
+  async hs(el) {
+    if (!TRUONG) { const r = await F.goi('qtMkHoSo', []); TRUONG = r.truong; BAC = r.bac; }
+    const nhom = await F.goi('qtMkNhom');
+    el.innerHTML = `<div class="the"><h2>Chọn nhóm</h2><div id="dk"></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><button class="nut navy nho" id="loc">Lọc</button>${co(['marketing']) ? '<input id="tenNhom" placeholder="Tên nhóm để lưu" style="max-width:240px;min-height:44px"><button class="nut phu nho" id="luuNhom">Lưu nhóm</button>' : ''}</div></div>
+      ${nhom.length ? `<div class="the"><h2>Nhóm đã lưu</h2>${nhom.map((n) => `<div class="dong"><span><b>${E(n.ten)}</b><br><span class="mo">${n.dieu_kien.map((d) => E(TRUONG[d.truong] || d.truong) + ' ' + ({ gte: '≥', lte: '≤', eq: '=' })[d.phep] + ' ' + E(String(d.giaTri))).join(' · ')}</span></span><span><b>${n.so}</b> người <button class="nut phu nho" data-dung="${n.id}">Dùng</button></span></div>`).join('')}</div>` : ''}
+      <div id="kq"></div>`;
+    veDieuKien($('dk'));
+    const loc = async () => { $('dk').docDK(); const r = await F.goi('qtMkHoSo', DK);
+      $('kq').innerHTML = `<div class="the cuon"><h2>${r.tong} người</h2><table><tr><th>Người</th><th>Bậc</th><th>CTV phụ trách</th><th>Đơn / chi</th><th>Mua cuối</th><th>Gói hết</th><th>Nguồn đầu</th><th>Đồng ý</th></tr>${r.ds.map((h) => `<tr><td><b>${E(h.ten || '—')}</b><br><span class="mo">${E(h.sdt)}${h.efc ? ' · ' + E(h.efc) : ''}</span></td><td>${E(h.bac || '')} ${E(h.bacLL || '')}</td><td>${E(h.ctvPhuTrach || '—')}</td><td class="so">${h.soDon} · ${F.tien(h.tongChi)}</td><td>${F.ngay(h.muaCuoi)}</td><td>${F.ngay(h.goiHet)}</td><td>${E(h.nguonDau || '—')}${h.chienDichDau ? '<br><span class="mo">' + E(h.chienDichDau) + '</span>' : ''}</td><td>${Object.entries({ qb_app: 'App', qb_zalo: 'Zalo', qb_sms: 'SMS', qb_email: 'Email' }).filter(([k]) => h.dongY[k]).map(([, t]) => `<span class="nhan xanh">${t}</span>`).join(' ') || '<span class="mo">—</span>'}</td></tr>`).join('')}</table>${r.tong > 200 ? '<p class="mo">Hiện 200 người đầu.</p>' : ''}</div>`; };
+    $('loc').onclick = () => lam($('loc'), $('b'), loc);
+    if ($('luuNhom')) $('luuNhom').onclick = () => lam($('luuNhom'), $('b'), async () => { $('dk').docDK(); await F.goi('qtMkNhom', { ten: $('tenNhom').value || 'Nhóm ' + new Date().toLocaleDateString('vi-VN'), dieuKien: DK }); mo('mk'); });
+    el.querySelectorAll('[data-dung]').forEach((b) => b.onclick = () => { DK = JSON.parse(JSON.stringify(nhom.find((n) => n.id === +b.dataset.dung).dieu_kien)); veDieuKien($('dk')); lam(b, $('b'), loc); });
+    if (DK.length) lam(null, $('b'), loc);
+  },
+  async cd(el) {
+    if (!TRUONG) { const r = await F.goi('qtMkHoSo', []); TRUONG = r.truong; BAC = r.bac; }
+    const d = await F.goi('qtMkDsCD'), nhom = await F.goi('qtMkNhom');
+    const taoDuoc = co(['marketing']), duyetDuoc = co(['gd_kd', 'ban_dh']);
+    el.innerHTML = `${taoDuoc ? `<details class="the" ${d.ds.length ? '' : 'open'}><summary>+ Tạo chiến dịch</summary>
+        <div class="hai" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:6px"><div><label for="cTen">Tên chiến dịch</label><input id="cTen" placeholder="Mời Gói An tâm tháng 11"></div>
+        <div><label for="cKenh">Kênh</label><select id="cKenh">${Object.entries(d.kenh).map(([k, t]) => `<option value="${k}">${E(t)}</option>`).join('')}</select></div>
+        <div><label for="cCd">Trang đích</label><select id="cCd"><option value="goi">Gói An tâm</option><option value="vali">Vali Y tế</option><option value="doanh-nghiep">Doanh nghiệp</option><option value="truong-hoc">Trường học</option><option value="ctv">Cơ hội CTV</option></select></div>
+        <div><label for="cDc">Nhóm đối chứng (%)</label><input id="cDc" type="number" min="0" max="50" value="10"></div></div>
+        <label for="cNd">Nội dung (với kênh CTV: lời nhắn cho CTV)</label><textarea id="cNd" rows="3" maxlength="500" placeholder="Nói giá trị trước. Không hứa chữa bệnh, không ghi chỉ số."></textarea>
+        <label>Nhóm người nhận</label>${nhom.length ? `<select id="cNhom" style="margin-bottom:6px"><option value="">— Tự chọn điều kiện —</option>${nhom.map((n) => `<option value="${n.id}">${E(n.ten)} (${n.so} người)</option>`).join('')}</select>` : ''}<div id="cDk"></div>
+        <button class="nut navy" id="cTao" style="margin-top:12px">Lưu nháp</button></details>` : ''}
+      ${d.ds.map((c) => `<div class="the"><div class="dong" style="border:0;padding:0"><span><b>${E(c.ma)}</b> · ${E(c.ten)} <span class="nhan ${TT_CD[c.trang_thai][0]}">${TT_CD[c.trang_thai][1]}</span><br><span class="mo">${E(d.kenh[c.kenh])} · trang ${E(c.chu_de)} · đối chứng ${c.doi_chung_pt}% · tạo bởi ${E(c.ten_tao || c.tao_boi)}${c.duyet_boi ? ' · duyệt bởi ' + E(c.ten_duyet || c.duyet_boi) : ''}</span></span>
+        <span>${c.trang_thai === 'nhap' && taoDuoc ? `<button class="nut nho" data-a="gui" data-id="${c.id}">Gửi duyệt</button>` : ''}${c.trang_thai === 'cho_duyet' && duyetDuoc && c.tao_boi !== TOI.efc ? `<button class="nut nho" data-a="duyet" data-id="${c.id}">Duyệt</button><button class="nut phu nho" data-a="tra" data-id="${c.id}">Trả về</button>` : ''}${c.trang_thai === 'da_duyet' && taoDuoc ? `<button class="nut navy nho" data-a="chay" data-id="${c.id}">Chạy</button>` : ''}${c.trang_thai === 'da_chay' ? `<button class="nut phu nho" data-a="kq" data-id="${c.id}">Kết quả</button>${c.kenh !== 'ctv' && taoDuoc ? `<button class="nut nho" data-a="xuat" data-id="${c.id}">Xuất danh sách</button>` : ''}` : ''}</span></div>
+        <p class="mo" style="margin-top:6px">${E(c.noi_dung)}</p><p class="mo" style="font-size:13px">Điều kiện: ${c.dieu_kien.map((x) => E(TRUONG[x.truong] || x.truong) + ' ' + ({ gte: '≥', lte: '≤', eq: '=' })[x.phep] + ' ' + E(String(x.giaTri))).join(' · ')}</p>
+        ${c.ly_do ? `<div class="bao" style="background:var(--vang-nhat);color:var(--vang)">Trả về: ${E(c.ly_do)}</div>` : ''}
+        ${c.trang_thai === 'da_chay' ? `<p class="mo">Gửi ${c.so_gui} · đối chứng ${c.so_dc} · loại ${c.so_loai} · chạy ${F.ngay(c.chay_luc)}</p>` : ''}<div id="kq${c.id}"></div></div>`).join('') || '<div class="the mo">Chưa có chiến dịch.</div>'}`;
+    if (taoDuoc) {
+      if (!DK.length) DK = [{ truong: 'laLead', phep: 'eq', giaTri: true }]; veDieuKien($('cDk'));
+      if ($('cNhom')) $('cNhom').onchange = () => { const n = nhom.find((x) => x.id === +$('cNhom').value); if (n) { DK = JSON.parse(JSON.stringify(n.dieu_kien)); veDieuKien($('cDk')); } };
+      $('cTao').onclick = () => lam($('cTao'), $('b'), async () => { $('cDk').docDK(); await F.goi('qtMkTaoCD', { ten: $('cTen').value, kenh: $('cKenh').value, chuDe: $('cCd').value, doiChungPt: $('cDc').value, noiDung: $('cNd').value, dieuKien: DK }); mo('mk'); });
+    }
+    el.querySelectorAll('[data-a]').forEach((b) => b.onclick = () => lam(b, $('b'), async () => {
+      const id = +b.dataset.id, a = b.dataset.a;
+      if (a === 'gui') await F.goi('qtMkGuiDuyet', id);
+      if (a === 'duyet') { if (!confirm('Duyệt chiến dịch này? Sau khi duyệt, Marketing chạy được.')) return; await F.goi('qtMkDuyet', id, true); }
+      if (a === 'tra') { const l = prompt('Lý do trả về:'); if (!l) return; await F.goi('qtMkDuyet', id, false, l); }
+      if (a === 'chay') { if (!confirm('Chạy chiến dịch? Hệ thống chọn người đủ điều kiện, chia nhóm đối chứng, tạo việc hoặc danh sách gửi.')) return; const r = await F.goi('qtMkChay', id); alert(`Gửi ${r.gui} · đối chứng ${r.doi_chung} · loại ${r.loai}`); }
+      if (a === 'kq') { const r = await F.goi('qtMkKetQua', id), pt = (x) => (x * 100).toFixed(1) + '%';
+        $('kq' + id).innerHTML = `<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:8px"><div class="kpi"><span>Nhóm gửi mua</span><b>${r.gui.mua}/${r.gui.so} · ${pt(r.gui.tyLe)}</b></div><div class="kpi"><span>Nhóm đối chứng mua</span><b>${r.doiChung.mua}/${r.doiChung.so} · ${pt(r.doiChung.tyLe)}</b></div><div class="kpi"><span>Chênh lệch</span><b>${(r.chenhLech * 100).toFixed(1)} điểm</b></div><div class="kpi"><span>Doanh thu nhóm gửi</span><b style="font-size:18px">${F.tien(r.gui.tien)}</b></div><div class="kpi"><span>Lượt xem link</span><b>${r.luotXem}</b></div><div class="kpi"><span>Để lại thông tin</span><b>${r.deLaiThongTin}</b></div></div>
+          ${r.viecCtv && r.viecCtv.tong ? `<p class="mo">Việc CTV: ${r.viecCtv.xong || 0}/${r.viecCtv.tong} đã làm.</p>` : ''}${r.loai.length ? `<p class="mo">Bị loại: ${r.loai.map((x) => E(x.ly_do) + ' (' + x.so + ')').join(' · ')}</p>` : ''}<p class="mo" style="font-size:13px">${E(r.ghiChu)} Khoảng ${r.tu.split('-').reverse().join('/')} – ${r.den.split('-').reverse().join('/')}.</p>`; return; }
+      if (a === 'xuat') { const r = await F.goi('qtMkXuat', id, location.origin + location.pathname.replace(/[^/]*$/, ''));
+        const csv = '﻿Họ tên,Số điện thoại,CTV phụ trách,Link\n' + r.ds.map((x) => [x.ten, x.sdt, x.ctv, x.link].map((v) => '"' + String(v || '').replace(/"/g, '""') + '"').join(',')).join('\n');
+        const a2 = document.createElement('a'); a2.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a2.download = r.ma + '-' + r.kenh + '.csv'; a2.click();
+        F.bao($('b'), `Đã xuất ${r.ds.length} người. Gửi ngoài giờ yên lặng (${r.gioYenLang}). Nội dung: ${r.noiDung}`, true); return; }
+      mo('mk');
+    }));
+  },
 };
 const TOI_LOTRINH = ['Chưa học', 'Đã dự OPP', 'Đã học sản phẩm', 'Đã học chính sách', 'Đã thực hành đo, cài ứng dụng', 'Đã đào tạo thực chiến'];
 (async () => { if (F.phien()) await vao(); else $('manDN').classList.remove('an'); })();
