@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Đề xuất App CTV FaCare</title>
+<style>
+  :root {
+    --bg: #f5f7f6; --card: #ffffff; --ink: #16233a; --mo: #5c6b7e;
+    --vien: #dce5e1; --xanh: #009574; --xanh-dam: #007a5f; --xanh-nhat: #e7f5f1;
+    --navy: #233a77; --vang: #a9720e; --vang-nhat: #fcefd2; --do: #b8342a; --do-nhat: #fbe1de;
+    --r: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10171a; --card: #182024; --ink: #e7eeec; --mo: #9fb0ac; --vien: #2a3835;
+      --xanh-nhat: #0f2b24; --vang-nhat: #332a12; --do-nhat: #381c17;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10171a; --card: #182024; --ink: #e7eeec; --mo: #9fb0ac; --vien: #2a3835;
+    --xanh-nhat: #0f2b24; --vang-nhat: #332a12; --do-nhat: #381c17;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, "Be Vietnam Pro", sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 60px; }
+  header.top { margin-bottom: 22px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--xanh-dam); background: var(--xanh-nhat); padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  h1 { font-size: clamp(22px, 4vw, 30px); margin: 0 0 6px; line-height: 1.25; }
+  .sub { color: var(--mo); font-size: 14.5px; margin: 0; }
+  .card { background: var(--card); border: 1px solid var(--vien); border-radius: var(--r); padding: 18px 20px; margin: 14px 0; }
+  .card h2 { font-size: 17px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  .num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--xanh); color: #fff; font-size: 13px; font-weight: 700; flex: none; }
+  .card h3 { font-size: 14.5px; margin: 14px 0 6px; color: var(--navy); }
+  .card p { margin: 6px 0; font-size: 14.5px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; font-size: 14.5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--vien); }
+  th { color: var(--mo); font-weight: 600; font-size: 13px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+  .pill.bs { background: var(--xanh-nhat); color: var(--xanh-dam); }
+  .pill.coach { background: #e8ecfb; color: var(--navy); }
+  :root[data-theme="dark"] .pill.coach { background: #1c274a; color: #b9c6f2; }
+  .pill.kd { background: var(--vang-nhat); color: var(--vang); }
+  ol.steps { list-style: none; margin: 10px 0 0; padding: 0; counter-reset: step; }
+  ol.steps li { counter-increment: step; padding: 10px 0 10px 38px; position: relative; border-top: 1px dashed var(--vien); font-size: 14.5px; }
+  ol.steps li:first-child { border-top: 0; }
+  ol.steps li::before { content: counter(step); position: absolute; left: 0; top: 9px; width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .footline { margin-top: 24px; font-size: 12.5px; color: var(--mo); text-align: center; }
+  code { background: var(--xanh-nhat); padding: 1px 6px; border-radius: 6px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="tag">ĐỀ XUẤT GỬI FACARE</span>
+    <h1>Sau test App Cộng tác viên FaCare (FaCare Companion)</h1>
+    <p class="sub">Bản test đang chờ phản hồi EFCare · Tổng hợp từ họp team nội bộ 10/11/2026</p>
+  </header>
+
+  <section class="card">
+    <h2><span class="num">1</span>Hiện trạng đã test</h2>
+    <p>App Cộng tác viên FaCare (<b>FaCare Companion</b>) đang ở bản test, chờ phản hồi từ EFCare.</p>
+    <h3>Đã có</h3>
+    <ul>
+      <li>Trang chủ: đo sinh hiệu (theo chỉ định bác sĩ), lịch hẹn, dinh dưỡng — mới có bài viết thông tin, <b>chưa thực thi được kế hoạch</b></li>
+      <li>Theo dõi hộ gia đình</li>
+      <li>Sàn mua hàng</li>
+      <li>Quản lý đội nhóm</li>
+    </ul>
+    <h3>Khoảng trống lớn nhất</h3>
+    <p>App Bác sĩ và App Cộng tác viên <b>chưa liên kết với nhau</b> — phần chuyên môn (bác sĩ chỉ định, CTV thực hiện, báo cáo lại) chưa dùng được. Đây là <b>điều kiện tiên quyết</b> cho gần hết yêu cầu ở mục 2.</p>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">2</span>Yêu cầu theo từng vai</h2>
+
+    <h3><span class="pill bs">Chuyên môn</span> &nbsp;BS Tiến</h3>
+    <ul>
+      <li>Quản lý danh sách cộng tác viên được phân công</li>
+      <li>Theo dõi thời gian thực hiện công việc</li>
+      <li>Xem lịch sử công việc</li>
+      <li>Nhận cảnh báo bất thường</li>
+    </ul>
+
+    <h3><span class="pill coach">Chuyên môn mở rộng</span> &nbsp;Coach Trí Dũng</h3>
+    <p>Đề xuất tách thêm một cấp tài khoản cao hơn CTV thường: <b>"Huấn luyện viên sức khỏe"</b>.</p>
+    <ul>
+      <li>Tên gọi ra ngoài (khách thấy): <b>"Trợ lý sức khỏe"</b></li>
+      <li>Tên gọi nội bộ: giữ đúng danh xưng chuyên môn, <b>tránh dùng từ "bác sĩ"</b> — đúng quy định pháp lý</li>
+    </ul>
+    <p>Nghiệp vụ thực hiện trên app:</p>
+    <ul>
+      <li>Xác nhận tình trạng sức khỏe và thiết lập mục tiêu cho khách hàng</li>
+      <li>Xây dựng kế hoạch dinh dưỡng và vận động</li>
+      <li>Biểu mẫu kế hoạch chăm sóc</li>
+    </ul>
+    <table>
+      <tr><th>Vai</th><th>Quyền</th></tr>
+      <tr><td>Cộng tác viên thường</td><td>Chỉ thực thi nhiệm vụ được giao</td></tr>
+      <tr><td>Cộng tác viên có chứng chỉ</td><td>Gắn thêm vai Huấn luyện viên sức khỏe, có quyền lập kế hoạch</td></tr>
+    </table>
+
+    <h3><span class="pill kd">Kinh doanh</span> &nbsp;Phạm Đình Vũ</h3>
+    <ul>
+      <li>Tổng doanh số cá nhân theo tháng</li>
+      <li>Tổng doanh số hệ thống theo tháng</li>
+      <li>Thuế thu nhập cá nhân (khấu trừ 10% khi tổng tháng từ 5 triệu, theo luật mới)</li>
+      <li>Sơ đồ cây hệ thống: chỉ hiển thị số điện thoại và thông tin của <b>nhánh trực tiếp</b></li>
+    </ul>
+
+    <h3>Phân luồng 2 nhóm ngay trong App CTV</h3>
+    <p>Cần phân luồng rõ từ điều hướng chính — không chỉ là một quyền ẩn trong cài đặt:</p>
+    <table>
+      <tr><th>Nhóm</th><th>Luồng trải nghiệm</th></tr>
+      <tr><td>CTV không chuyên môn</td><td>Thực thi nhiệm vụ: nhận việc, báo kết quả, bán hàng, mạng lưới</td></tr>
+      <tr><td>CTV có chuyên môn (Health Coach — "Trợ lý sức khỏe")</td><td>Thêm luồng chuyên môn riêng: hồ sơ đồng hành, phân tích chỉ số, lập kế hoạch dinh dưỡng/vận động</td></tr>
+    </table>
+
+    <h3>Biểu mẫu kế hoạch chăm sóc (theo file Coach Trí Dũng cung cấp)</h3>
+    <p>Cấu trúc trường dữ liệu của form "Kế hoạch dinh dưỡng, vận động":</p>
+    <ul>
+      <li><b>A. Hồ sơ đồng hành:</b> Họ tên · SĐT · Email · Giới tính · Tuổi · Chiều cao · Cân nặng · Vòng 2 · Vòng 3 · Mục tiêu · Bệnh mãn tính</li>
+      <li><b>B. Phân tích chỉ số:</b> BMI (thang WHO và IDI/WPRO cho người châu Á) · WHR Eo/Hông theo giới tính và tuổi · Năng lượng tiêu hao (RMR, AMR, TEE, % tăng/giảm, Calo mục tiêu, Calo Protein)</li>
+      <li><b>C. Kết quả phiên coach mục tiêu:</b> Mục tiêu sức khỏe · Thực trạng · Thách thức · Cam kết hành động</li>
+      <li><b>D. Kế hoạch dinh dưỡng:</b> theo từng bữa (sáng / xế sáng / trưa / xế chiều / tối) — Calo mục tiêu, tối đa 3 lựa chọn thực phẩm, Calo thực tế, lượng nước trong ngày</li>
+      <li><b>E. Kế hoạch vận động &amp; giấc ngủ</b> — mục cần có trong form, chi tiết bổ sung sau</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">3</span>Đề xuất thứ tự làm việc với FaCare</h2>
+    <ol class="steps">
+      <li><b>Chốt trước:</b> liên kết App Bác sĩ ⇄ App CTV — không có bước này, các mục chuyên môn bên dưới không chạy được.</li>
+      <li>Luồng quản lý công việc CTV cho BS Tiến (danh sách phân công, thời gian, lịch sử, cảnh báo).</li>
+      <li>Phân luồng 2 nhóm trong App CTV + vai "Huấn luyện viên sức khỏe" theo chứng chỉ (Coach Trí Dũng) — làm cùng lúc rà lại tên gọi nội bộ cho đúng pháp lý.</li>
+      <li>Hiển thị doanh số cá nhân/hệ thống, thuế TNCN, sơ đồ nhánh trực tiếp cho CTV (anh Vũ).</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">4</span>Cần làm rõ trước khi họp FaCare</h2>
+    <ul>
+      <li>FaCare có mốc thời gian nào cho việc liên kết App Bác sĩ ⇄ App CTV không — đây là nút thắt của toàn bộ đề xuất</li>
+      <li>Đầu mối kỹ thuật phía FaCare cho các mục trên là ai</li>
+    </ul>
+  </section>
+
+  <p class="footline">EFCARE · FaCare Life — 10/11/2026</p>
+</div>
+</body>
+</html>
