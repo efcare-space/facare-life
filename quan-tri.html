@@ -172,7 +172,7 @@ const V = {
     if ($('khoa')) $('khoa').onclick = () => lam($('khoa'), $('b'), async () => { if (!confirm('Chốt kỳ ' + d.ky + '? Sau khi chốt, đơn trả lại sẽ ghi điều chỉnh vào kỳ sau.')) return; await F.goi('qtKhoaKy', d.ky); mo('hh', d.ky); });
   },
   async nguoi(nd, tim = '') {
-    const ds = await F.goi('qtNguoi', tim), VAI = { ke_toan: 'Kế toán', kho: 'Kho, giao vận', hoc_vien: 'Học viện', dieu_phoi: 'Điều phối chăm sóc', gd_kd: 'GĐ Kinh doanh', ban_dh: 'Ban điều hành', marketing: 'Marketing', bac_si: 'Bác sĩ', quan_ly: 'Quản lý L1–L5', super_admin: 'Super Admin' };
+    const ds = await F.goi('qtNguoi', tim), VAI = { ctv: 'Cộng tác viên', ke_toan: 'Kế toán', kho: 'Kho, giao vận', hoc_vien: 'Học viện', dieu_phoi: 'Điều phối chăm sóc', gd_kd: 'GĐ Kinh doanh', ban_dh: 'Ban điều hành', marketing: 'Marketing', bac_si: 'Bác sĩ', quan_ly: 'Quản lý L1–L5', super_admin: 'Super Admin' };
     nd.innerHTML = `<h1>Người và vai</h1><p class="mo">Người cần đăng nhập FaCare Life một lần bằng tài khoản EFCARE trước khi gán vai.</p>
       <div class="loc"><input id="tim" placeholder="Tìm tên, SĐT, mã EFC" value="${E(tim)}" style="max-width:280px"><button id="timN">Tìm</button></div><div id="b"></div>
       <div class="the cuon"><table><tr><th>Người</th><th>Vai</th><th>Gán thêm</th></tr>${ds.map((n) => `<tr><td><b>${E(n.ten)}</b><br><span class="mo">${E(n.efc)} · ${E(n.sdt)}</span></td>

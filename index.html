@@ -68,7 +68,7 @@ const IC = {
 };
 const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
 const TABS = {
-  khach: [['tong', 'Tổng quan', 'nha'], ['don', 'Đơn hàng', 'don'], ['mua', 'Sản phẩm', 'mua'], ['dongy', 'Dữ liệu', 'khoa']],
+  khach: [['tong', 'Tổng quan', 'nha'], ['don', 'Đơn hàng', 'don'], ['mua', 'Sản phẩm', 'mua'], ['dongy', 'Dữ liệu', 'khoa'], ['toi', 'Tôi', 'toi']],
   ctv: [['homnay', 'Hôm nay', 'viec'], ['lead', 'Lead', 'pheu'], ['ban', 'Bán hàng', 'ban'], ['hoc', 'Học', 'hoc'], ['doi', 'Mạng lưới', 'nguoi'], ['toi', 'Tôi', 'toi']],
 };
 
@@ -129,11 +129,14 @@ const KHACH = {
     nd.innerHTML = `<h1>Chào ${E(TOI.ten)}</h1><p class="mo" style="margin-bottom:14px">Mã EFCARE của anh chị: <b>${E(TOI.efc)}</b></p>
       ${cho.length ? `<div class="the" style="border-color:var(--vang)"><h2>Chờ thanh toán</h2>${cho.map((x) => `<div class="dong"><span>${E(x.ma)}</span><span class="so">${F.tien(x.tong)}</span></div>`).join('')}
         <p class="mo" style="margin-top:8px">Chuyển khoản trong 24 giờ với nội dung là <b>mã đơn</b>. ${d.taiKhoan ? 'Tài khoản: ' + E(d.taiKhoan) : 'Cộng tác viên sẽ gửi thông tin tài khoản nhận tiền.'}</p></div>` : ''}
+      ${TOI.ctv ? '' : `<div class="the" style="border-color:var(--xanh)"><h2>Muốn cùng đồng hành?</h2><p class="mo">Trở thành cộng tác viên FaCare Life — học miễn phí, bán Vali Y tế, có thu nhập.</p>
+        <button class="nut rong" id="khTongCtv" style="margin-top:10px">Trở thành cộng tác viên</button></div>`}
       <div class="the"><h2>Người đồng hành</h2>${d.ctvPhuTrach ? `<div class="dong"><span>Cộng tác viên<br><b>${E(d.ctvPhuTrach.ten)}</b></span><a class="nut phu nho" href="tel:${E(d.ctvPhuTrach.sdt)}">Gọi ${E(d.ctvPhuTrach.sdt)}</a></div>` : '<p class="mo">Chưa có cộng tác viên phụ trách.</p>'}
         ${d.bacSi ? `<div class="dong"><span>Bác sĩ gia đình<br><b>${E(d.bacSi)}</b></span></div>` : '<p class="mo" style="margin-top:6px">Bác sĩ gia đình được phân công khi anh chị dùng Gói An tâm gia đình.</p>'}</div>
       ${d.lichSapToi && d.lichSapToi.length ? `<div class="the"><h2>Lịch sắp tới</h2>${d.lichSapToi.map((v) => `<div class="dong"><span>${E(v.loai)}</span><span class="mo">${F.ngay(v.han)}</span></div>`).join('')}</div>` : ''}
       <div class="the"><h2>Đơn gần đây</h2>${d.don.length ? d.don.slice(0, 3).map((x) => `<div class="dong"><span>${E(x.ma)}<br><span class="mo">${F.TT[x.trang_thai]}</span></span><span class="so">${F.tien(x.tong)}</span></div>`).join('') : '<p class="mo">Chưa có đơn.</p>'}</div>
       <p class="mo">Chỉ số sức khỏe xem trên ứng dụng FaCare. FaCare Life không lưu thông tin y khoa.</p>`;
+    if (!TOI.ctv) $('khTongCtv').onclick = () => veDangKyCtv();
   },
   async don(nd) { const d = await F.goi('khachTongQuan'); nd.innerHTML = '<h1 style="margin-bottom:12px">Đơn hàng</h1>' + (d.don.length ? d.don.map((x) => theDon(x)).join('') : '<div class="the mo">Chưa có đơn.</div>'); },
   async mua(nd) {
@@ -158,7 +161,16 @@ const KHACH = {
       } catch (e) { c.checked = !c.checked; F.bao($('dyBao'), e.message); }
     });
   },
-
+  async toi(nd) {
+    const coCtv = !!TOI.ctv;
+    nd.innerHTML = `<h1>Của tôi</h1><div class="the"><div class="dong"><span>Họ tên</span><b>${E(TOI.ten)}</b></div>
+      <div class="dong"><span>Mã EFCARE (mã giới thiệu)</span><b>${E(TOI.efc)}</b></div><div class="dong"><span>Số điện thoại</span><b>${E(TOI.sdt)}</b></div></div>
+      ${coCtv ? '' : `<button class="nut rong" id="khTroThanh" style="margin-top:12px">Trở thành cộng tác viên</button>`}
+      <a class="nut phu rong" href="cai-dat.html" style="margin-top:12px">Hướng dẫn cài ứng dụng</a>
+      <button class="nut phu rong" id="khOut" style="margin-top:8px">Đăng xuất</button>`;
+    if (!coCtv) $('khTroThanh').onclick = () => veDangKyCtv();
+    $('khOut').onclick = () => { F.dangXuat(); location.reload(); };
+  },
 };
 
 // ---- Đăng ký CTV ----
@@ -170,7 +182,12 @@ function veDangKyCtv() {
     <label class="o-chon"><input type="checkbox" id="cDy"> Tôi đồng ý điều khoản cộng tác của FaCare Life.</label><div id="cBao"></div>
     <button class="nut rong" id="cNut">Đăng ký cộng tác viên</button><button class="nut phu rong" id="cBo" style="margin-top:8px">Để sau, vào phần khách hàng</button></div>`;
   $('cBo').onclick = () => { $('duoi').classList.remove('an'); chuyenKG('khach'); };
-  $('cNut').onclick = () => lam($('cNut'), $('cBao'), async () => { await F.goi('dangKyCtv', { tinh: $('cTinh').value, email: $('cMail').value, nguoiGt: $('cGt').value, dongY: $('cDy').checked }); KG = 'ctv'; $('duoi').classList.remove('an'); await vao(); });
+  $('cNut').onclick = () => lam($('cNut'), $('cBao'), async () => { await F.goi('dangKyCtv', { tinh: $('cTinh').value, email: $('cMail').value, nguoiGt: $('cGt').value, dongY: $('cDy').checked }); veCtvThanhCong(); });
+}
+function veCtvThanhCong() {
+  $('noiDung').innerHTML = `<h1>Đã trở thành cộng tác viên</h1><div class="the"><p class="mo">Tài khoản EFCARE của anh chị giờ có 2 không gian: <b>Khách hàng</b> và <b>Cộng tác viên</b>. Chuyển qua lại bằng nút ở đầu trang bất cứ lúc nào, không cần đăng nhập lại.</p>
+    <button class="nut rong" id="ctvBd" style="margin-top:12px">Bắt đầu với không gian Cộng tác viên</button></div>`;
+  $('ctvBd').onclick = async () => { KG = 'ctv'; $('duoi').classList.remove('an'); await vao(); };
 }
 
 // ---- Không gian Cộng tác viên ----
